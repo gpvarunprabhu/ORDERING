@@ -1,6 +1,6 @@
-# JKKN Campus Food Ordering System
+# Campus Food Ordering System
 
-Welcome to the **JKKN Campus Food Ordering System**, a centralized digital platform that streamlines food ordering within campus boundaries. The application connects students, canteen vendors, and campus administrators into a unified, single-page workflow.
+Welcome to the **Campus Food Ordering System**, a centralized digital platform that streamlines food ordering within campus boundaries. The application connects students, canteen vendors, and campus administrators into a unified, single-page workflow.
 
 ## 🚀 Getting Started
 
@@ -41,10 +41,13 @@ To verify the app operations, follow this complete checkout-to-handover cycle:
 
 ### 1. Unified Login
 * Upon landing, select the **Student**, **Manager**, or **Admin** tab.
-* Use the **Quick Test Accounts** section at the bottom for instant, one-click authorization.
+* Log in using these credentials:
+  - **Student**: ID `STU001` and Email `arun.cse@campus.edu`
+  - **Canteen Manager**: Select **Classic Food Court** and enter Security PIN `1234`
+  - **Admin**: Email `admin@campus.edu` and Password `admin123`
 
 ### 2. Administrator Dashboard
-* Log in as **Super Admin**.
+* Log in as **Super Admin** using `admin@campus.edu` / `admin123`.
 * Observe campus-wide metrics: Gross Merchandise Value (GMV), Total Orders, and User Adoption.
 * Explore the **Canteen Management** page (e.g. register a new canteen) and **Student Directory** (e.g. view student details or toggle account blocks).
 * Navigate to **Report Generator** ➔ click **Generate Report** ➔ click **Export Excel (.CSV)** or **Export PDF Ledger** to download real transaction records.

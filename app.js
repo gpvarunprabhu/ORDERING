@@ -1,5 +1,5 @@
 /**
- * JKKN Campus Food Ordering System - Application Controller
+ * Campus Food Ordering System - Application Controller
  * Handles SPA routing, UI rendering, cart operations, Kanban state updates, 
  * real-time notification events, SVG analytics plotting, and CSV/PDF report downloads.
  */
@@ -54,12 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 2. GLOBAL EVENT REGISTRY & MOCK WEBSOCKET SIMULATION ---
   // Broadcast announcement list
   let broadcasts = [
-    { id: 'BC001', title: 'Welcome to JKKN Food Portal!', message: 'Avoid queue delays by remote pre-ordering during class breaks. Payments can be settled via UPI or cash.', type: 'info', timestamp: Date.now() - 3600000 },
+    { id: 'BC001', title: 'Welcome to Campus Food Portal!', message: 'Avoid queue delays by remote pre-ordering during class breaks. Payments can be settled via UPI or cash.', type: 'info', timestamp: Date.now() - 3600000 },
     { id: 'BC002', title: 'Summer Drinks Discount', message: 'Get 10% off on all fresh juices at Healthy & Fresh canteen this week!', type: 'holiday', timestamp: Date.now() - 1800000 }
   ];
 
   // Inter-role real-time simulator events
-  window.addEventListener('jkkn_new_order', (e) => {
+  window.addEventListener('campus_new_order', (e) => {
     const order = e.detail;
     showToast(`🔔 New Order Received! Token #${order.token}`, 'info');
     playNotificationSound('alert');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  window.addEventListener('jkkn_order_status_change', (e) => {
+  window.addEventListener('campus_order_status_change', (e) => {
     const order = e.detail;
     if (state.currentRole === 'student' && state.currentUser && state.currentUser.id === order.studentId) {
       showToast(`📍 Order #${order.id} status updated to: ${order.status}!`, 'success');
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Watch for student block state changes
-  window.addEventListener('jkkn_db_update', (e) => {
+  window.addEventListener('campus_db_update', (e) => {
     if (e.detail.table === 'students' && state.currentRole === 'student' && state.currentUser) {
       const student = window.db.getStudentById(state.currentUser.id);
       if (student && student.status === 'Blocked') {
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
       roleBadge.textContent = 'Administrator';
       roleBadge.className = 'role-badge danger';
       uName.textContent = 'Super Admin';
-      uDetails.textContent = 'JKKN Campus Hub';
+      uDetails.textContent = 'Campus Hub';
       
       switchAdminSubView('admin-kpis');
       renderAdminDashboard();
@@ -313,42 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('admin-email-input').value;
     const pass = document.getElementById('admin-pass-input').value;
 
-    if (email === 'admin@jkkn.ac.in' && pass === 'admin123') {
+    if (email === 'admin@campus.edu' && pass === 'admin123') {
       switchRoleView('admin');
       showToast('Global Administrator Session Initialized.', 'success');
     } else {
       showToast('Invalid Admin Credentials.', 'danger');
     }
   });
-
-  // QUICK DEMO ONE-CLICK LOGIN EVENT HANDLERS
-  document.getElementById('demo-student').addEventListener('click', () => {
-    const student = window.db.getStudentById('STU001');
-    switchRoleView('student', student);
-    showToast(`Quick Login: student ${student.name} active.`, 'success');
-  });
-
-  document.getElementById('demo-blocked-student').addEventListener('click', () => {
-    const student = window.db.getStudentById('STU005');
-    if (student.status === 'Blocked') {
-      showToast('🛑 Access Denied: Rahul R is Blocked by administrator.', 'danger');
-    } else {
-      switchRoleView('student', student);
-    }
-  });
-
-  document.getElementById('demo-manager').addEventListener('click', () => {
-    const canteen = window.db.getCanteenById('CAN001');
-    switchRoleView('manager', canteen);
-    showToast(`Quick Login: canteen managerMr. Ramesh active.`, 'success');
-  });
-
-  document.getElementById('demo-admin').addEventListener('click', () => {
-    switchRoleView('admin');
-    showToast('Quick Login: Super Admin active.', 'success');
-  });
-
-
   // --- 6. STUDENT PORTAL LOGIC ---
   // Sub-view Tab Switcher
   const studentSubtabs = document.querySelectorAll('.student-tab');
@@ -1025,7 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const receiptContent = document.getElementById('receipt-modal-content');
     receiptContent.innerHTML = `
-      <div class="receipt-title">JKKN CAMPUS FOOD COURT</div>
+      <div class="receipt-title">CAMPUS FOOD COURT</div>
       <div style="text-align:center; font-size:0.75rem; color:var(--text-secondary); margin-bottom:1rem;">
         ${canteen ? canteen.name : 'Vendor'}<br>
         ${canteen ? canteen.location : ''}<br>
@@ -1051,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="receipt-divider"></div>
       <div style="text-align:center; font-size:0.75rem; color:var(--text-secondary); margin-top:1rem;">
         Thank you for ordering digital!<br>
-        Powered by JKKN Campus Systems
+        Powered by Campus Systems
       </div>
     `;
 
@@ -2150,7 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const link = document.createElement('a');
     
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', `jkkn_canteen_report_${Date.now()}.csv`);
+    link.setAttribute('download', `campus_canteen_report_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2163,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.lastGeneratedReport.length === 0) return;
 
     let txtContent = '==========================================================\n';
-    txtContent += '       JKKN CAMPUS SYSTEM - FINANCIAL REVENUE LEDGER      \n';
+    txtContent += '       CAMPUS SYSTEM - FINANCIAL REVENUE LEDGER      \n';
     txtContent += `       Report Range: Generated at ${new Date().toLocaleString()}\n`;
     txtContent += '==========================================================\n\n';
     
@@ -2192,7 +2163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const link = document.createElement('a');
     
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', `jkkn_ledger_report_${Date.now()}.txt`);
+    link.setAttribute('download', `campus_ledger_report_${Date.now()}.txt`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2294,5 +2265,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 11. INITIAL APP RENDERING SEED BOOTSTRAP ---
   // Default initialization - show login card tab student
   document.getElementById('tab-student').click();
-  showToast('JKKN Digital Food Court Loaded.', 'info');
+  showToast('Digital Food Court Loaded.', 'info');
 });

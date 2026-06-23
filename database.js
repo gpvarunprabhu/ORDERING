@@ -1,5 +1,5 @@
 /**
- * JKKN Campus Food Ordering System - Data Layer
+ * Campus Food Ordering System - Data Layer
  * Handles relational storage, CRUD operations, transactions, seed data, and analytics.
  * Fully backed by localStorage for persistent mock state.
  */
@@ -22,7 +22,7 @@ class Database {
   }
 
   init() {
-    if (!localStorage.getItem('jkkn_db_seeded')) {
+    if (!localStorage.getItem('campus_db_seeded')) {
       this.seed();
     }
   }
@@ -31,11 +31,11 @@ class Database {
   seed() {
     // 1. Students
     const students = [
-      { id: 'STU001', name: 'Arun Kumar', department: 'Computer Science', year: 'III', mobile: '9876543210', email: 'arun.cse@jkkn.ac.in', status: 'Active' },
-      { id: 'STU002', name: 'Priya Dharshini', department: 'Information Technology', year: 'IV', mobile: '9876543211', email: 'priya.it@jkkn.ac.in', status: 'Active' },
-      { id: 'STU003', name: 'Sanjay Ram', department: 'Electronics & Communication', year: 'II', mobile: '9876543212', email: 'sanjay.ece@jkkn.ac.in', status: 'Active' },
-      { id: 'STU004', name: 'Divya Bharathi', department: 'Electrical & Electronics', year: 'III', mobile: '9876543213', email: 'divya.eee@jkkn.ac.in', status: 'Active' },
-      { id: 'STU005', name: 'Rahul R', department: 'Mechanical Engineering', year: 'I', mobile: '9876543214', email: 'rahul.mech@jkkn.ac.in', status: 'Blocked' }
+      { id: 'STU001', name: 'Arun Kumar', department: 'Computer Science', year: 'III', mobile: '9876543210', email: 'arun.cse@campus.edu', status: 'Active' },
+      { id: 'STU002', name: 'Priya Dharshini', department: 'Information Technology', year: 'IV', mobile: '9876543211', email: 'priya.it@campus.edu', status: 'Active' },
+      { id: 'STU003', name: 'Sanjay Ram', department: 'Electronics & Communication', year: 'II', mobile: '9876543212', email: 'sanjay.ece@campus.edu', status: 'Active' },
+      { id: 'STU004', name: 'Divya Bharathi', department: 'Electrical & Electronics', year: 'III', mobile: '9876543213', email: 'divya.eee@campus.edu', status: 'Active' },
+      { id: 'STU005', name: 'Rahul R', department: 'Mechanical Engineering', year: 'I', mobile: '9876543214', email: 'rahul.mech@campus.edu', status: 'Blocked' }
     ];
 
     // 2. Canteens
@@ -228,25 +228,25 @@ class Database {
     ];
 
     // Save to localStorage
-    localStorage.setItem('jkkn_students', JSON.stringify(students));
-    localStorage.setItem('jkkn_canteens', JSON.stringify(canteens));
-    localStorage.setItem('jkkn_foodItems', JSON.stringify(foodItems));
-    localStorage.setItem('jkkn_orders', JSON.stringify(orders));
-    localStorage.setItem('jkkn_orderDetails', JSON.stringify(orderDetails));
-    localStorage.setItem('jkkn_reviews', JSON.stringify(reviews));
-    localStorage.setItem('jkkn_token_counter', '110'); // Last token used
-    localStorage.setItem('jkkn_db_seeded', 'true');
+    localStorage.setItem('campus_students', JSON.stringify(students));
+    localStorage.setItem('campus_canteens', JSON.stringify(canteens));
+    localStorage.setItem('campus_foodItems', JSON.stringify(foodItems));
+    localStorage.setItem('campus_orders', JSON.stringify(orders));
+    localStorage.setItem('campus_orderDetails', JSON.stringify(orderDetails));
+    localStorage.setItem('campus_reviews', JSON.stringify(reviews));
+    localStorage.setItem('campus_token_counter', '110'); // Last token used
+    localStorage.setItem('campus_db_seeded', 'true');
   }
 
   // Generic localStorage Getters & Setters
   get(key) {
-    return JSON.parse(localStorage.getItem(`jkkn_${key}`)) || [];
+    return JSON.parse(localStorage.getItem(`campus_${key}`)) || [];
   }
 
   set(key, data) {
-    localStorage.setItem(`jkkn_${key}`, JSON.stringify(data));
+    localStorage.setItem(`campus_${key}`, JSON.stringify(data));
     // Trigger custom window event to notify active view routers of change
-    window.dispatchEvent(new CustomEvent('jkkn_db_update', { detail: { table: key } }));
+    window.dispatchEvent(new CustomEvent('campus_db_update', { detail: { table: key } }));
   }
 
   // STUDENTS METHODS
@@ -331,9 +331,9 @@ class Database {
     const details = this.get('orderDetails');
     
     // Increment Token Counter
-    let counter = parseInt(localStorage.getItem('jkkn_token_counter') || '110') + 1;
+    let counter = parseInt(localStorage.getItem('campus_token_counter') || '110') + 1;
     if (counter > 999) counter = 101; // Wrap around standard tokens
-    localStorage.setItem('jkkn_token_counter', String(counter));
+    localStorage.setItem('campus_token_counter', String(counter));
 
     const orderId = 'ORD' + String(orders.length + 1001);
     
@@ -376,7 +376,7 @@ class Database {
     this.set('foodItems', foodList);
 
     // Dispatch global toast notice for the canteen manager
-    window.dispatchEvent(new CustomEvent('jkkn_new_order', { detail: newOrder }));
+    window.dispatchEvent(new CustomEvent('campus_new_order', { detail: newOrder }));
 
     return newOrder;
   }
@@ -397,7 +397,7 @@ class Database {
       this.set('orders', orders);
       
       // Dispatch status update event
-      window.dispatchEvent(new CustomEvent('jkkn_order_status_change', { detail: order }));
+      window.dispatchEvent(new CustomEvent('campus_order_status_change', { detail: order }));
     }
   }
 
@@ -542,16 +542,16 @@ class Database {
 
   // Clean wipe and reseed helper
   resetDatabase() {
-    localStorage.removeItem('jkkn_students');
-    localStorage.removeItem('jkkn_canteens');
-    localStorage.removeItem('jkkn_foodItems');
-    localStorage.removeItem('jkkn_orders');
-    localStorage.removeItem('jkkn_orderDetails');
-    localStorage.removeItem('jkkn_reviews');
-    localStorage.removeItem('jkkn_token_counter');
-    localStorage.removeItem('jkkn_db_seeded');
+    localStorage.removeItem('campus_students');
+    localStorage.removeItem('campus_canteens');
+    localStorage.removeItem('campus_foodItems');
+    localStorage.removeItem('campus_orders');
+    localStorage.removeItem('campus_orderDetails');
+    localStorage.removeItem('campus_reviews');
+    localStorage.removeItem('campus_token_counter');
+    localStorage.removeItem('campus_db_seeded');
     this.seed();
-    window.dispatchEvent(new CustomEvent('jkkn_db_update', { detail: { table: 'all' } }));
+    window.dispatchEvent(new CustomEvent('campus_db_update', { detail: { table: 'all' } }));
   }
 }
 
