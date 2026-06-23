@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Food Ordering System</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ========================================================================= -->
+  <!-- 1. NOTIFICATION TOAST SYSTEM                                              -->
+  <!-- ========================================================================= -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. LOGIN PAGE (Unified Portal)                                           -->
+  <!-- ========================================================================= -->
+  <div id="login-container" class="login-container active">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-accent">⚡</div>
+        <h1>CAMPUS</h1>
+        <p>Food Ordering System</p>
+      </div>
+
+      <!-- Login Role Tabs -->
+      <div class="login-tabs">
+        <button type="button" class="login-tab active" data-role="student" id="tab-student">Student</button>
+        <button type="button" class="login-tab" data-role="manager" id="tab-manager">Manager</button>
+        <button type="button" class="login-tab" data-role="admin" id="tab-admin">Admin</button>
+      </div>
+
+      <!-- Login Forms Wrapper -->
+      <div class="login-forms-container">
+        <!-- Student Form -->
+        <form id="student-login-form" class="login-form active">
+          <div class="form-group">
+            <label for="student-id-input">Student ID / Mobile Number</label>
+            <input type="text" id="student-id-input" placeholder="e.g., STU001 or 9876543210" required>
+          </div>
+          <div class="form-group">
+            <label for="student-email-input">College Email Address</label>
+            <input type="email" id="student-email-input" placeholder="username@campus.edu" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-student-login">Sign In as Student</button>
+        </form>
+
+        <!-- Manager Form -->
+        <form id="manager-login-form" class="login-form">
+          <div class="form-group">
+            <label for="manager-canteen-select">Select Your Canteen</label>
+            <select id="manager-canteen-select" required>
+              <option value="" disabled selected>Choose canteen...</option>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="manager-pass-input">Security PIN</label>
+            <input type="password" id="manager-pass-input" placeholder="••••" maxlength="4" required value="1234">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-manager-login">Access Vendor Panel</button>
+        </form>
+
+        <!-- Admin Form -->
+        <form id="admin-login-form" class="login-form">
+          <div class="form-group">
+            <label for="admin-email-input">Admin Email</label>
+            <input type="email" id="admin-email-input" placeholder="admin@campus.edu" required value="admin@campus.edu">
+          </div>
+          <div class="form-group">
+            <label for="admin-pass-input">Password</label>
+            <input type="password" id="admin-pass-input" placeholder="••••••••" required value="admin123">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-admin-login">Sign In to Global Console</button>
+        </form>
+      </div>
+
+      <!-- Quick Demo Login Helpers -->
+      <div class="demo-login-box">
+        <div class="demo-title">⚡ Quick Test Accounts (One-Click)</div>
+        <div class="demo-buttons">
+          <button type="button" class="btn-demo" id="demo-student">Student (Arun)</button>
+          <button type="button" class="btn-demo text-warning" id="demo-blocked-student">Blocked Student (Rahul)</button>
+          <button type="button" class="btn-demo" id="demo-manager">Canteen Manager (Ramesh)</button>
+          <button type="button" class="btn-demo" id="demo-admin">Super Admin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. APPLICATION WRAPPER (Hidden until Logged In)                           -->
+  <!-- ========================================================================= -->
+  <div id="app-container" class="app-container">
+    
+    <!-- HEADER BAR -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="header-logo-icon">⚡</span>
+        <span class="header-logo-text">Campus Food</span>
+        <span id="role-badge" class="role-badge">Student</span>
+      </div>
+      <div class="header-right">
+        <!-- Display Board Link -->
+        <button type="button" class="btn-text" id="header-btn-display" title="View Digital Token Board">📺 Display Board</button>
+        <!-- User Info -->
+        <div class="user-profile-widget">
+          <span id="header-user-name" class="user-name">Guest</span>
+          <span id="header-user-details" class="user-subtext">Department</span>
+        </div>
+        <button type="button" class="btn-logout" id="btn-logout" title="Sign Out">Sign Out 🚪</button>
+      </div>
+    </header>
+
+    <!-- CONTENT PANEL WRAPPER -->
+    <main class="app-main">
+
+      <!-- ========================================================================= -->
+      <!-- 3.1 STUDENT VIEW                                                         -->
+      <!-- ========================================================================= -->
+      <div id="view-student" class="role-view">
+        <!-- Bottom Tab Bar Navigation for Student (Mobile-like feel) -->
+        <div class="student-tabs">
+          <button class="student-tab active" data-subview="student-discover" id="tab-stu-discover">🍔 Menu</button>
+          <button class="student-tab" data-subview="student-cart" id="tab-stu-cart">🛒 Cart (<span id="cart-badge">0</span>)</button>
+          <button class="student-tab" data-subview="student-track" id="tab-stu-track">📍 Track</button>
+          <button class="student-tab" data-subview="student-history" id="tab-stu-history">📜 History</button>
+        </div>
+
+        <!-- 3.1.1 DISCOVERY & ORDERING VIEW -->
+        <div id="subview-student-discover" class="student-subview active">
+          <!-- Notification Alert Feed -->
+          <div id="student-alert-banner" class="student-alert-banner hidden">
+            <span class="bell-icon">🔔</span>
+            <span id="student-alert-text">Campus announcement: Holiday on Friday</span>
+            <button class="close-banner" onclick="this.parentElement.classList.add('hidden')">×</button>
+          </div>
+
+          <div class="welcome-section">
+            <h2>What would you like to eat?</h2>
+            <p>Order fresh food from your favorite campus canteens</p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="discovery-controls">
+            <input type="text" id="search-food" class="search-input" placeholder="Search for food items (e.g. burger, coffee)...">
+            <select id="canteen-filter" class="canteen-dropdown">
+              <option value="all">All Canteens</option>
+              <!-- Filled dynamically -->
+            </select>
+          </div>
+
+          <!-- Categories Carousel -->
+          <div class="categories-bar">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="Meals">Meals</button>
+            <button class="category-btn" data-category="Fast Food">Fast Food</button>
+            <button class="category-btn" data-category="Snacks">Snacks</button>
+            <button class="category-btn" data-category="Salad">Salad</button>
+            <button class="category-btn" data-category="Drinks">Drinks</button>
+          </div>
+
+          <!-- Today's Specials (Horizontal Slider) -->
+          <div class="specials-section">
+            <h3 class="section-title">Today's Specials ✨</h3>
+            <div id="specials-slider" class="specials-slider">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Canteen List Section -->
+          <div class="canteens-section">
+            <h3 class="section-title">Canteens On Campus 🏫</h3>
+            <div id="canteens-grid" class="canteens-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- All Food Items Feed -->
+          <div class="all-food-section">
+            <h3 class="section-title">Popular Items & Main Menu 🍔</h3>
+            <div id="menu-items-grid" class="menu-items-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.1.2 CART VIEW -->
+        <div id="subview-student-cart" class="student-subview">
+          <div class="section-header">
+            <h2>Your Smart Cart</h2>
+            <button class="btn btn-sm btn-outline-danger" id="btn-clear-cart">Clear All</button>
+          </div>
+
+          <div id="cart-container" class="cart-container-wrapper">
+            <!-- Empty state and active cart items are rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 3.1.3 LIVE TRACKING VIEW -->
+        <div id="subview-student-track" class="student-subview">
+          <div class="section-header">
+            <h2>Order Progress</h2>
+          </div>
+          <div id="tracking-container" class="tracking-container">
+            <!-- Dynamic loading of current orders or empty state -->
+          </div>
+        </div>
+
+        <!-- 3.1.4 ORDER HISTORY & REVIEW VIEW -->
+        <div id="subview-student-history" class="student-subview">
+          <div class="section-header">
+            <h2>Order History</h2>
+          </div>
+          <div id="history-list" class="history-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ========================================================================= -->
+      <!-- 3.2 CANTEEN MANAGER VIEW                                                 -->
+      <!-- ========================================================================= -->
+      <div id="view-manager" class="role-view">
+        <!-- Sidebar and Content grid -->
+        <div class="manager-layout">
+          <!-- Manager Sub Navigation -->
+          <aside class="manager-sidebar">
+            <div class="canteen-info-card">
+              <h3 id="canteen-mgr-name">Canteen Name</h3>
+              <p id="canteen-mgr-loc">Location</p>
+              <div id="canteen-mgr-status" class="status-indicator online">Store Open</div>
+            </div>
+            
+            <nav class="manager-nav">
+              <button class="manager-tab active" data-subview="mgr-orders" id="tab-mgr-orders">📋 Live Orders</button>
+              <button class="manager-tab" data-subview="mgr-menu" id="tab-mgr-menu">🍔 Menu & Inventory</button>
+              <button class="manager-tab" data-subview="mgr-promos" id="tab-mgr-promos">🏷️ Promotions</button>
+              <button class="manager-tab" data-subview="mgr-analytics" id="tab-mgr-analytics">📊 Store Analytics</button>
+              <button class="manager-tab" data-subview="mgr-scanner" id="tab-mgr-scanner">📸 Handover (QR)</button>
+            </nav>
+          </aside>
+
+          <!-- Manager Content -->
+          <section class="manager-content">
+            
+            <!-- 3.2.1 LIVE ORDER KANBAN BOARD -->
+            <div id="subview-mgr-orders" class="manager-subview active">
+              <div class="section-header">
+                <h2>Live Order Operations</h2>
+                <div class="board-legend">
+                  <span class="legend-dot status-placed"></span> Placed
+                  <span class="legend-dot status-accepted"></span> Accepted
+                  <span class="legend-dot status-preparing"></span> Preparing
+                  <span class="legend-dot status-ready"></span> Ready for Pickup
+                </div>
+              </div>
+
+              <!-- Kanban Columns -->
+              <div class="kanban-board">
+                <!-- COLUMN 1: NEW / PLACED -->
+                <div class="kanban-column" id="kanban-placed">
+                  <div class="kanban-column-header">
+                    <h3>New Orders <span class="badge" id="count-placed">0</span></h3>
+                  </div>
+                  <div class="kanban-cards-container" id="cards-placed"></div>
+                </div>
+
+                <!-- COLUMN 2: ACCEPTED & PREPARING -->
+                <div class="kanban-column" id="kanban-preparing">
+                  <div class="kanban-column-header">
+                    <h3>Preparing <span class="badge" id="count-preparing">0</span></h3>
+                  </div>
+                  <div class="kanban-cards-container" id="cards-preparing"></div>
+                </div>
+
+                <!-- COLUMN 3: READY FOR PICKUP -->
+                <div class="kanban-column" id="kanban-ready">
+                  <div class="kanban-column-header">
+                    <h3>Ready for Collection <span class="badge" id="count-ready">0</span></h3>
+                  </div>
+                  <div class="kanban-cards-container" id="cards-ready"></div>
+                </div>
+
+                <!-- COLUMN 4: COMPLETED / RECENT -->
+                <div class="kanban-column" id="kanban-completed">
+                  <div class="kanban-column-header">
+                    <h3>Completed Today <span class="badge" id="count-completed">0</span></h3>
+                  </div>
+                  <div class="kanban-cards-container" id="cards-completed"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.2.2 MENU & INVENTORY CONTROL -->
+            <div id="subview-mgr-menu" class="manager-subview">
+              <div class="section-header">
+                <h2>Menu & Stock Control</h2>
+                <button class="btn btn-primary" id="btn-add-food-modal">➕ Add New Item</button>
+              </div>
+
+              <div class="menu-inventory-table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Image</th>
+                      <th>Food Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Prep Time</th>
+                      <th>Stock Availability</th>
+                      <th>Special / Combo</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mgr-menu-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3.2.3 PROMOTIONS MODULE -->
+            <div id="subview-mgr-promos" class="manager-subview">
+              <div class="section-header">
+                <h2>Create Promotions & Combo Deals</h2>
+              </div>
+              
+              <div class="promo-layout">
+                <div class="card promo-form-card">
+                  <h3>Add New Promotion</h3>
+                  <form id="promo-creation-form">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="promo-title">Promo Title / Combo Name</label>
+                        <input type="text" id="promo-title" placeholder="e.g. Festival Thali Combo or 15% Weekend Off" required>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="promo-type">Discount Type</label>
+                        <select id="promo-type" required>
+                          <option value="percentage">Percentage Discount (%)</option>
+                          <option value="flat">Flat Value Discount (₹)</option>
+                          <option value="combo">Custom Combo Deal Price</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="promo-val">Discount Value / Price (₹ / %)</label>
+                        <input type="number" id="promo-val" placeholder="e.g. 15 or 50" min="1" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="promo-desc">Promo Description</label>
+                      <textarea id="promo-desc" rows="3" placeholder="Explain the promo details to students..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Launch Promotion</button>
+                  </form>
+                </div>
+
+                <div class="promo-list-card">
+                  <h3>Active Promotions</h3>
+                  <div id="active-promos-list" class="active-promos-list">
+                    <!-- Dynamically seeded/created promotions -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.2.4 STORE ANALYTICS -->
+            <div id="subview-mgr-analytics" class="manager-subview">
+              <div class="section-header">
+                <h2>Store Performance & Sales Trends</h2>
+              </div>
+
+              <!-- Mini Stats -->
+              <div class="stats-grid">
+                <div class="stat-card card-gradient-blue">
+                  <h4>Daily Revenue (Today)</h4>
+                  <p class="stat-value" id="mgr-stat-revenue">₹0</p>
+                  <span class="stat-label">From completed orders</span>
+                </div>
+                <div class="stat-card card-gradient-emerald">
+                  <h4>Total Orders Fulfilled</h4>
+                  <p class="stat-value" id="mgr-stat-volume">0</p>
+                  <span class="stat-label">Successful transactions</span>
+                </div>
+                <div class="stat-card card-gradient-orange">
+                  <h4>Avg Fulfillment Time</h4>
+                  <p class="stat-value" id="mgr-stat-time">10m</p>
+                  <span class="stat-label">Under operational target</span>
+                </div>
+              </div>
+
+              <div class="analytics-charts-grid">
+                <div class="card chart-card">
+                  <h3>Popular Items Sales Trends</h3>
+                  <div class="trending-list" id="mgr-trending-items">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+                <div class="card chart-card">
+                  <h3>Recent Customer Feedback</h3>
+                  <div class="reviews-feed" id="mgr-reviews-feed">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.2.5 HANDOVER QR SCANNER SIMULATOR -->
+            <div id="subview-mgr-scanner" class="manager-subview">
+              <div class="section-header">
+                <h2>Order Verification & Collection Handover</h2>
+              </div>
+
+              <div class="scanner-container-box">
+                <div class="scanner-card">
+                  <div class="scanner-viewport">
+                    <div class="scanner-aim-box"></div>
+                    <div class="scanner-laser"></div>
+                    <div id="scanner-sim-message" class="scanner-overlay-msg">Align QR code to scan</div>
+                  </div>
+                  
+                  <div class="scanner-controls">
+                    <h3>Simulate Handover Process</h3>
+                    <p>Enter the Token number manually, select an active order to scan, or scan a student QR code to verify and release the food items.</p>
+                    
+                    <div class="input-inline-group">
+                      <input type="number" id="scanner-token-input" placeholder="Enter Token Number (e.g. 108)">
+                      <button type="button" class="btn btn-primary" id="btn-scanner-verify-token">Verify Token</button>
+                    </div>
+
+                    <div class="ready-orders-dropdown-group">
+                      <label for="scanner-order-select">Or Select Live "Ready" Order:</label>
+                      <select id="scanner-order-select">
+                        <option value="">No ready orders currently</option>
+                      </select>
+                      <button type="button" class="btn btn-success btn-block" id="btn-scanner-verify-order">Simulate QR Scan Handover</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="scanner-results-card card" id="scanner-results-card">
+                  <h3>Scan Result</h3>
+                  <div class="result-placeholder" id="scan-result-content">
+                    <span class="info-icon">❔</span>
+                    <p>Scan a QR code or submit a token to see order validation results here.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </section>
+        </div>
+      </div>
+
+
+      <!-- ========================================================================= -->
+      <!-- 3.3 ADMINISTRATOR VIEW                                                   -->
+      <!-- ========================================================================= -->
+      <div id="view-admin" class="role-view">
+        <div class="admin-layout">
+          <!-- Sidebar -->
+          <aside class="admin-sidebar">
+            <div class="admin-profile-header">
+              <span class="shield-icon">🛡️</span>
+              <h3>Global Admin</h3>
+              <p>Campus Admin Panel</p>
+            </div>
+            <nav class="admin-nav">
+              <button class="admin-tab active" data-subview="admin-kpis" id="tab-adm-kpis">📊 KPI Analytics</button>
+              <button class="admin-tab" data-subview="admin-canteens" id="tab-adm-canteens">🏫 Canteens Management</button>
+              <button class="admin-tab" data-subview="admin-students" id="tab-adm-students">🎓 Student Directory</button>
+              <button class="admin-tab" data-subview="admin-broadcasts" id="tab-adm-broadcasts">📢 Global Broadcasts</button>
+              <button class="admin-tab" data-subview="admin-reports" id="tab-adm-reports">📁 Report Generator</button>
+            </nav>
+          </aside>
+
+          <!-- Main Content -->
+          <section class="admin-content">
+            <!-- 3.3.1 KPI DASHBOARD -->
+            <div id="subview-admin-kpis" class="admin-subview active">
+              <div class="section-header">
+                <h2>Campus Operations KPI Dashboard</h2>
+                <span id="admin-analytics-date" class="timestamp-badge">Updated: Just Now</span>
+              </div>
+
+              <!-- Main KPIs -->
+              <div class="stats-grid">
+                <div class="stat-card card-gradient-purple">
+                  <h4>Gross Merchandise Value (GMV)</h4>
+                  <p class="stat-value" id="adm-kpi-gmv">₹0</p>
+                  <span class="stat-label">Total platform sales (completed)</span>
+                </div>
+                <div class="stat-card card-gradient-blue">
+                  <h4>Total Order Volume</h4>
+                  <p class="stat-value" id="adm-kpi-orders">0</p>
+                  <span class="stat-label">Completed & live orders</span>
+                </div>
+                <div class="stat-card card-gradient-emerald">
+                  <h4>User Adoption Rate</h4>
+                  <p class="stat-value" id="adm-kpi-adoption">0%</p>
+                  <span class="stat-label" id="adm-kpi-student-counts">0 / 0 active students</span>
+                </div>
+                <div class="stat-card card-gradient-orange">
+                  <h4>Average Order Value (AOV)</h4>
+                  <p class="stat-value" id="adm-kpi-aov">₹0</p>
+                  <span class="stat-label">Avg basket size per checkout</span>
+                </div>
+              </div>
+
+              <!-- Analytics Charts and Breakdowns -->
+              <div class="analytics-charts-grid">
+                <!-- Day-Wise Sales Trend Chart (Custom SVGs) -->
+                <div class="card chart-card">
+                  <h3>Revenue Trend (Last 7 Days)</h3>
+                  <div class="chart-container" id="revenue-trend-chart-container">
+                    <!-- SVG Chart inserted dynamically -->
+                  </div>
+                </div>
+
+                <!-- Canteen Side-by-Side Comparison -->
+                <div class="card chart-card">
+                  <h3>Canteen Market Share Comparison</h3>
+                  <div class="canteen-comparison-list" id="canteen-comparison-container">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+
+                <!-- Peak Hour Analysis -->
+                <div class="card chart-card flex-2">
+                  <h3>Peak Ordering Hours</h3>
+                  <div class="peak-hours-visual" id="peak-hours-container">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+
+                <!-- Top Selling Items globally -->
+                <div class="card chart-card">
+                  <h3>Top Selling Food Items</h3>
+                  <div class="top-selling-list" id="adm-top-items-container">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.3.2 CANTEEN MANAGEMENT -->
+            <div id="subview-admin-canteens" class="admin-subview">
+              <div class="section-header">
+                <h2>Campus Canteen Facilities</h2>
+                <button class="btn btn-primary" id="btn-add-canteen-modal">➕ Register Canteen</button>
+              </div>
+
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Canteen ID</th>
+                      <th>Canteen Name</th>
+                      <th>Location</th>
+                      <th>Assign Manager</th>
+                      <th>Contact Number</th>
+                      <th>Operational Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adm-canteens-tbody">
+                    <!-- Filled dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3.3.3 STUDENT DIRECTORY -->
+            <div id="subview-admin-students" class="admin-subview">
+              <div class="section-header">
+                <h2>Registered Campus Students</h2>
+              </div>
+
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Student ID</th>
+                      <th>Name</th>
+                      <th>Department & Year</th>
+                      <th>Mobile Number</th>
+                      <th>College Email</th>
+                      <th>Account Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adm-students-tbody">
+                    <!-- Filled dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3.3.4 GLOBAL BROADCASTS -->
+            <div id="subview-admin-broadcasts" class="admin-subview">
+              <div class="section-header">
+                <h2>Campus Global Broadcaster</h2>
+              </div>
+
+              <div class="broadcast-layout">
+                <div class="card form-card">
+                  <h3>Broadcast Push Notification</h3>
+                  <form id="admin-broadcast-form">
+                    <div class="form-group">
+                      <label for="broadcast-title">Announcement Title</label>
+                      <input type="text" id="broadcast-title" placeholder="e.g., Canteen Holiday Notice or system update" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="broadcast-message">Notification Message</label>
+                      <textarea id="broadcast-message" rows="4" placeholder="Enter details to alert all active students..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="broadcast-type">Urgency Badge</label>
+                      <select id="broadcast-type">
+                        <option value="info">💡 Information (System Announcement)</option>
+                        <option value="holiday">🎉 Holiday / Festival Discount</option>
+                        <option value="warning">⚠️ Urgent (Maintenance / Closure)</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Send Global Push Alert</button>
+                  </form>
+                </div>
+
+                <div class="card broadcast-history-card">
+                  <h3>Broadcast Log (Active Announcements)</h3>
+                  <div class="broadcast-log-list" id="broadcast-log-list">
+                    <!-- Seeded notifications -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.3.5 REPORT GENERATOR -->
+            <div id="subview-admin-reports" class="admin-subview">
+              <div class="section-header">
+                <h2>Financial & Operations Report Center</h2>
+              </div>
+
+              <div class="report-config-card card">
+                <h3>Export Sales & Tax Records</h3>
+                <p>Generate downloadable Excel (.csv) and PDF format worksheets detailing complete order transactions, canteen metrics, and sales breakdowns.</p>
+                
+                <div class="report-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="report-range">Select Timeline Range</label>
+                      <select id="report-range">
+                        <option value="today">Today (Live Data)</option>
+                        <option value="week">Current Week (Last 7 Days)</option>
+                        <option value="month">Monthly Overview (Last 30 Days)</option>
+                        <option value="all">Complete Database Backlog</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="report-canteen">Filter by Facility</label>
+                      <select id="report-canteen">
+                        <option value="all">All Canteens</option>
+                        <!-- Populated dynamically -->
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="report-actions">
+                    <button type="button" class="btn btn-primary" id="btn-generate-report">📊 Generate Report Breakdown</button>
+                    <button type="button" class="btn btn-outline" id="btn-export-csv" disabled>📥 Export Excel (.CSV)</button>
+                    <button type="button" class="btn btn-outline" id="btn-export-pdf" disabled>📥 Export PDF Ledger</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generated Report Table Preview -->
+              <div class="card report-preview-card hidden" id="report-preview-section">
+                <div class="preview-header">
+                  <h3>Report Data Sheets Preview</h3>
+                  <span class="badge badge-success" id="report-preview-count">0 Records Found</span>
+                </div>
+                
+                <div class="report-table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Timestamp</th>
+                        <th>Canteen</th>
+                        <th>Student Name</th>
+                        <th>Payment</th>
+                        <th>Items List</th>
+                        <th>Total Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody id="report-preview-tbody">
+                      <!-- Populated dynamically on generate -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- 4. DIALOGS & OVERLAY MODALS                                              -->
+  <!-- ========================================================================= -->
+  
+  <!-- 4.1 FOOD ITEM EDIT/ADD MODAL (CANTEEN MANAGER) -->
+  <div id="food-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="food-modal-title">Add Food Item</h3>
+        <button class="close-modal" id="btn-close-food-modal">×</button>
+      </div>
+      <form id="food-item-form">
+        <input type="hidden" id="food-item-id">
+        <div class="form-group">
+          <label for="food-name-input">Food Item Name</label>
+          <input type="text" id="food-name-input" placeholder="e.g. Masala Dosa" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="food-category-select">Category</label>
+            <select id="food-category-select" required>
+              <option value="Meals">Meals</option>
+              <option value="Fast Food">Fast Food</option>
+              <option value="Snacks">Snacks</option>
+              <option value="Salad">Salad</option>
+              <option value="Drinks">Drinks</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="food-price-input">Price (₹)</label>
+            <input type="number" id="food-price-input" min="1" placeholder="e.g. 50" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="food-prep-input">Prep Time (Mins)</label>
+            <input type="number" id="food-prep-input" min="1" placeholder="e.g. 10" required>
+          </div>
+          <div class="form-group">
+            <label for="food-image-select">Image Template</label>
+            <select id="food-image-select" required>
+              <option value="meals">🍛 Meals Style</option>
+              <option value="burger">🍔 Burger Style</option>
+              <option value="pizza">🍕 Pizza Style</option>
+              <option value="noodles">🍜 Noodles Style</option>
+              <option value="sandwich">🥪 Sandwich Style</option>
+              <option value="salad">🥗 Salad Style</option>
+              <option value="juice">🍹 Juice Style</option>
+              <option value="coffee">☕ Coffee/Tea Style</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="food-desc-input">Food Description</label>
+          <textarea id="food-desc-input" rows="3" placeholder="Tell students about this dish..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-food-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Food Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4.2 CANTEEN ADD/EDIT MODAL (ADMIN) -->
+  <div id="canteen-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="canteen-modal-title">Register Canteen</h3>
+        <button class="close-modal" id="btn-close-canteen-modal">×</button>
+      </div>
+      <form id="canteen-item-form">
+        <input type="hidden" id="canteen-id-field">
+        <div class="form-group">
+          <label for="canteen-name-input">Canteen Name</label>
+          <input type="text" id="canteen-name-input" placeholder="e.g. North Side Cafeteria" required>
+        </div>
+        <div class="form-group">
+          <label for="canteen-location-input">Location / Block</label>
+          <input type="text" id="canteen-location-input" placeholder="e.g. Library Block, 1st Floor" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="canteen-manager-input">Manager Name</label>
+            <input type="text" id="canteen-manager-input" placeholder="e.g. Mr. David" required>
+          </div>
+          <div class="form-group">
+            <label for="canteen-phone-input">Contact Phone</label>
+            <input type="tel" id="canteen-phone-input" placeholder="10 digit number" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-canteen-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Register Canteen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4.3 ORDER DETAIL / RECEIPT POPUP -->
+  <div id="receipt-modal" class="modal-overlay">
+    <div class="modal-card modal-receipt">
+      <div class="modal-header">
+        <h3>Digital Order Invoice</h3>
+        <button class="close-modal" id="btn-close-receipt-modal">×</button>
+      </div>
+      <div class="receipt-body" id="receipt-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-block" onclick="window.print()">🖨️ Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.4 STUDENT RATING / REVIEW MODAL -->
+  <div id="rating-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Rate Your Food Experience</h3>
+        <button class="close-modal" id="btn-close-rating-modal">×</button>
+      </div>
+      <form id="rating-form">
+        <input type="hidden" id="rating-order-id">
+        <div class="rating-picker-wrapper">
+          <p>Rate the food from 1 to 5 stars:</p>
+          <div class="stars-rating-selector">
+            <span class="rating-star" data-rating="1">★</span>
+            <span class="rating-star" data-rating="2">★</span>
+            <span class="rating-star" data-rating="3">★</span>
+            <span class="rating-star" data-rating="4">★</span>
+            <span class="rating-star" data-rating="5">★</span>
+          </div>
+          <input type="hidden" id="selected-rating-val" value="5" required>
+        </div>
+        <div class="form-group">
+          <label for="rating-comment">Feedback & Reviews</label>
+          <textarea id="rating-comment" rows="3" placeholder="Tell other students how the meal tasted (optional)..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-rating-modal">Skip</button>
+          <button type="submit" class="btn btn-success">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4.5 PUBLIC DIGITAL DISPLAY BOARD MODAL -->
+  <div id="display-board-overlay" class="modal-overlay">
+    <div class="display-board-fullscreen">
+      <div class="display-board-header">
+        <h1>🏫 CAMPUS FOOD COURT DISPLAY</h1>
+        <button class="btn-close-display" id="btn-close-display">Close Fullscreen [X]</button>
+      </div>
+      <div class="display-board-panels">
+        <!-- Panel 1: Preparing -->
+        <div class="display-panel panel-preparing">
+          <h2>👨‍🍳 PREPARING TOKENS</h2>
+          <div class="tokens-container" id="display-preparing-tokens">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Panel 2: Ready -->
+        <div class="display-panel panel-ready">
+          <h2>🔔 READY FOR PICKUP</h2>
+          <div class="tokens-container animate-pulse" id="display-ready-tokens">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="display-board-footer">
+        <span>Please present your verification Token / QR Code at the respective counters for collection.</span>
+        <span id="display-board-time">00:00:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. GLOBAL FLOATING ROLE SWITCHER                                         -->
+  <!-- ========================================================================= -->
+  <div class="global-role-switcher" id="global-role-switcher">
+    <div class="switcher-toggle-btn" id="switcher-toggle-btn" title="Developer / Quick Switcher View">
+      ⚙️ Role Bypass
+    </div>
+    <div class="switcher-menu" id="switcher-menu">
+      <div class="switcher-header">Bypass Current View</div>
+      <button class="switcher-btn active" data-target-role="student">👨‍🎓 Student Portal</button>
+      <button class="switcher-btn" data-target-role="manager">🧑‍🍳 Canteen Operator</button>
+      <button class="switcher-btn" data-target-role="admin">🛡️ Global Administrator</button>
+      <div class="switcher-footer">Switch view simulation instantly</div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- 6. APPLICATION SCRIPTS                                                    -->
+  <!-- ========================================================================= -->
+  <script src="database.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
