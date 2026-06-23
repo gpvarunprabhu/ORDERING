@@ -334,42 +334,27 @@ input:focus, select:focus, textarea:focus {
 .login-form.active {
   display: block;
 }
-
-.demo-login-box {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px dashed var(--border-color);
-}
-
-.demo-title {
-  font-size: 0.85rem;
-  font-weight: 600;
+.demo-login-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--bg-tertiary);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-  text-align: center;
+  line-height: 1.5;
 }
-
-.demo-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+.demo-login-info strong {
+  color: var(--warning);
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-display);
 }
-
-.btn-demo {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 0.5rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-  font-family: var(--font-body);
-}
-.btn-demo:hover {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: var(--primary);
+.demo-login-info code {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-family: monospace;
   color: var(--text-primary);
 }
 
@@ -2097,4 +2082,227 @@ input:focus, select:focus, textarea:focus {
   .analytics-charts-grid, .promo-layout, .broadcast-layout, .scanner-container-box {
     grid-template-columns: 1fr;
   }
+}
+
+/* --- GOOGLE OAUTH SIMULATOR & AUTH TOGGLES --- */
+.auth-toggle-link {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.clickable-link {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.clickable-link:hover {
+  color: #818cf8;
+}
+
+.google-auth-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.google-auth-separator::before, .google-auth-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+.google-auth-separator:not(:empty)::before { margin-right: .5em; }
+.google-auth-separator:not(:empty)::after { margin-left: .5em; }
+
+.btn-google {
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.btn-google:hover {
+  background-color: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Google Auth Card & Modal styling */
+.google-auth-card {
+  background-color: #ffffff;
+  color: #1f2937;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 380px;
+  padding: 2.25rem 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+  animation: scaleUp 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.google-auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.google-auth-header h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 0.5rem;
+  letter-spacing: -0.01em;
+}
+.google-auth-header p {
+  color: #4b5563;
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.google-accounts-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.google-account-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+  width: 100%;
+  text-align: left;
+}
+.google-account-item:hover {
+  background-color: #f3f4f6;
+  border-color: #cbd5e1;
+}
+
+.google-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #e5e7eb;
+  color: #374151;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.95rem;
+  font-family: var(--font-display);
+}
+
+.google-account-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.google-account-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+.google-account-email {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.google-auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  margin: 0.75rem 0 1rem;
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+.google-auth-divider::before, .google-auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+.google-auth-divider:not(:empty)::before { margin-right: .5em; }
+.google-auth-divider:not(:empty)::after { margin-left: .5em; }
+
+.google-custom-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form-group-google input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  color: #1f2937;
+  font-size: 0.9rem;
+  outline: none;
+}
+.form-group-google input:focus {
+  border-color: #4285F4;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+}
+
+.btn-google-submit {
+  width: 100%;
+  padding: 0.7rem;
+  background-color: #4285F4;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-display);
+}
+.btn-google-submit:hover {
+  background-color: #357ae8;
+}
+
+.btn-google-cancel {
+  margin-top: 1rem;
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-google-cancel:hover {
+  color: #111827;
+  text-decoration: underline;
 }

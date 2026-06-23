@@ -280,8 +280,151 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Match email
+    if (found.email.toLowerCase() !== inputEmail.toLowerCase()) {
+      showToast('Email address does not match this Student ID.', 'danger');
+      return;
+    }
+
     switchRoleView('student', found);
     showToast(`Welcome back, ${found.name}!`, 'success');
+  });
+
+  // Toggle Student Sign In / Sign Up views
+  document.getElementById('link-go-to-signup').addEventListener('click', () => {
+    document.getElementById('student-signin-section').classList.add('hidden');
+    document.getElementById('student-signup-section').classList.remove('hidden');
+  });
+
+  document.getElementById('link-go-to-signin').addEventListener('click', () => {
+    document.getElementById('student-signup-section').classList.add('hidden');
+    document.getElementById('student-signin-section').classList.remove('hidden');
+  });
+
+  // Student manual registration submission
+  document.getElementById('student-register-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const regId = document.getElementById('reg-id-input').value.trim().toUpperCase();
+    const name = document.getElementById('reg-name-input').value.trim();
+    const dept = document.getElementById('reg-dept-select').value;
+    const year = document.getElementById('reg-year-select').value;
+    const mobile = document.getElementById('reg-mobile-input').value.trim();
+    const email = document.getElementById('reg-email-input').value.trim();
+
+    // Check if ID exists
+    const students = window.db.getStudents();
+    if (students.some(s => s.id.toLowerCase() === regId.toLowerCase())) {
+      showToast('Student ID already registered. Use Sign In.', 'danger');
+      return;
+    }
+
+    // Check if email or mobile exists
+    if (students.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+      showToast('Email address is already in use.', 'danger');
+      return;
+    }
+
+    const newStudent = {
+      id: regId,
+      name: name,
+      department: dept,
+      year: year,
+      mobile: mobile,
+      email: email,
+      status: 'Active'
+    };
+
+    window.db.saveStudent(newStudent);
+    switchRoleView('student', newStudent);
+    
+    // Reset form and toggles
+    document.getElementById('student-register-form').reset();
+    document.getElementById('student-signup-section').classList.add('hidden');
+    document.getElementById('student-signin-section').classList.remove('hidden');
+    
+    showToast(`Account created! Welcome, ${name}.`, 'success');
+  });
+
+  // Google OAuth Simulator
+  const googleModal = document.getElementById('google-auth-modal');
+  
+  document.getElementById('btn-google-login').addEventListener('click', () => {
+    renderGoogleAccountsPicker();
+    googleModal.classList.add('active');
+  });
+
+  document.getElementById('btn-close-google-modal').addEventListener('click', () => {
+    googleModal.classList.remove('active');
+  });
+
+  function renderGoogleAccountsPicker() {
+    const picker = document.getElementById('google-accounts-picker');
+    picker.innerHTML = '';
+
+    const students = window.db.getStudents().filter(s => s.status === 'Active');
+    
+    students.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'google-account-item';
+      
+      // Google user initials avatar
+      const initials = s.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+      item.innerHTML = `
+        <div class="google-avatar">${initials}</div>
+        <div class="google-account-details">
+          <span class="google-account-name">${s.name}</span>
+          <span class="google-account-email">${s.email}</span>
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        googleModal.classList.remove('active');
+        switchRoleView('student', s);
+        showToast(`Signed in with Google as ${s.name}!`, 'success');
+      });
+      picker.appendChild(item);
+    });
+  }
+
+  // Google Custom Gmail Account Registration Form Submit
+  document.getElementById('google-custom-auth-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('google-custom-name').value.trim();
+    const email = document.getElementById('google-custom-email').value.trim().toLowerCase();
+
+    const students = window.db.getStudents();
+    let found = students.find(s => s.email.toLowerCase() === email);
+
+    if (found) {
+      if (found.status === 'Blocked') {
+        showToast('🛑 This student account has been blocked.', 'danger');
+        return;
+      }
+      googleModal.classList.remove('active');
+      switchRoleView('student', found);
+      showToast(`Signed in with Google as ${found.name}!`, 'success');
+    } else {
+      // Register new student automatically representing Google Login
+      const randomId = 'STU' + Math.floor(100 + Math.random() * 900); // STU100-999
+      const randomMobile = '9' + Math.floor(100000000 + Math.random() * 900000000); // 10 digit number starting with 9
+      
+      const newStudent = {
+        id: randomId,
+        name: name,
+        department: 'Computer Science',
+        year: 'I',
+        mobile: randomMobile,
+        email: email,
+        status: 'Active'
+      };
+
+      window.db.saveStudent(newStudent);
+      googleModal.classList.remove('active');
+      switchRoleView('student', newStudent);
+      showToast(`Google Registration Success! Welcome, ${name}.`, 'success');
+    }
+
+    document.getElementById('google-custom-auth-form').reset();
   });
 
   // Manager manual login submission
