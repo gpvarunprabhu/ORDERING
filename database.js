@@ -22,7 +22,7 @@ class Database {
   }
 
   init() {
-    if (!localStorage.getItem('campus_db_seeded')) {
+    if (!localStorage.getItem('campus_db_seeded_v3')) {
       this.seed();
     }
   }
@@ -31,18 +31,18 @@ class Database {
   seed() {
     // 1. Students
     const students = [
-      { id: 'STU001', name: 'Arun Kumar', department: 'Computer Science', year: 'III', mobile: '9876543210', email: 'arun.cse@campus.edu', status: 'Active' },
-      { id: 'STU002', name: 'Priya Dharshini', department: 'Information Technology', year: 'IV', mobile: '9876543211', email: 'priya.it@campus.edu', status: 'Active' },
-      { id: 'STU003', name: 'Sanjay Ram', department: 'Electronics & Communication', year: 'II', mobile: '9876543212', email: 'sanjay.ece@campus.edu', status: 'Active' },
-      { id: 'STU004', name: 'Divya Bharathi', department: 'Electrical & Electronics', year: 'III', mobile: '9876543213', email: 'divya.eee@campus.edu', status: 'Active' },
-      { id: 'STU005', name: 'Rahul R', department: 'Mechanical Engineering', year: 'I', mobile: '9876543214', email: 'rahul.mech@campus.edu', status: 'Blocked' }
+      { id: 'STU001', name: 'Arun Kumar', department: 'Computer Science', year: 'III', mobile: '9876543210', email: 'arun.cse@campus.edu', password: 'student123', status: 'Active' },
+      { id: 'STU002', name: 'Priya Dharshini', department: 'Information Technology', year: 'IV', mobile: '9876543211', email: 'priya.it@campus.edu', password: 'student123', status: 'Active' },
+      { id: 'STU003', name: 'Sanjay Ram', department: 'Electronics & Communication', year: 'II', mobile: '9876543212', email: 'sanjay.ece@campus.edu', password: 'student123', status: 'Active' },
+      { id: 'STU004', name: 'Divya Bharathi', department: 'Electrical & Electronics', year: 'III', mobile: '9876543213', email: 'divya.eee@campus.edu', password: 'student123', status: 'Active' },
+      { id: 'STU005', name: 'Rahul R', department: 'Mechanical Engineering', year: 'I', mobile: '9876543214', email: 'rahul.mech@campus.edu', password: 'student123', status: 'Blocked' }
     ];
 
     // 2. Canteens
     const canteens = [
-      { id: 'CAN001', name: 'Classic Food Court', location: 'Main Block - Ground Floor', manager: 'Mr. Ramesh', phone: '9443218765', status: 'Active' },
-      { id: 'CAN002', name: 'Spicy Corner', location: 'Open Cafeteria - Near Gym', manager: 'Mr. John', phone: '9443218766', status: 'Active' },
-      { id: 'CAN003', name: 'Healthy & Fresh', location: 'Sports Complex Annex', manager: 'Mrs. Geetha', phone: '9443218767', status: 'Active' }
+      { id: 'CAN001', name: 'Classic Food Court', location: 'Main Block - Ground Floor', manager: 'Mr. Ramesh', phone: '9443218765', email: 'ramesh@canteen.edu', password: 'canteen123', status: 'Active' },
+      { id: 'CAN002', name: 'Spicy Corner', location: 'Open Cafeteria - Near Gym', manager: 'Mr. John', phone: '9443218766', email: 'john@canteen.edu', password: 'canteen123', status: 'Active' },
+      { id: 'CAN003', name: 'Healthy & Fresh', location: 'Sports Complex Annex', manager: 'Mrs. Geetha', phone: '9443218767', email: 'geetha@canteen.edu', password: 'canteen123', status: 'Active' }
     ];
 
     // 3. Food Items
@@ -235,7 +235,7 @@ class Database {
     localStorage.setItem('campus_orderDetails', JSON.stringify(orderDetails));
     localStorage.setItem('campus_reviews', JSON.stringify(reviews));
     localStorage.setItem('campus_token_counter', '110'); // Last token used
-    localStorage.setItem('campus_db_seeded', 'true');
+    localStorage.setItem('campus_db_seeded_v3', 'true');
   }
 
   // Generic localStorage Getters & Setters
@@ -549,7 +549,7 @@ class Database {
     localStorage.removeItem('campus_orderDetails');
     localStorage.removeItem('campus_reviews');
     localStorage.removeItem('campus_token_counter');
-    localStorage.removeItem('campus_db_seeded');
+    localStorage.removeItem('campus_db_seeded_v3');
     this.seed();
     window.dispatchEvent(new CustomEvent('campus_db_update', { detail: { table: 'all' } }));
   }
