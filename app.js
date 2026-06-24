@@ -713,29 +713,44 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('div');
       card.className = 'food-card';
       
-      // Stock label
+      // Stock label / ADD button Swiggy/Zomato style
       let stockBtnHTML = '';
       if (item.status === 'Available') {
-        stockBtnHTML = `<button class="btn btn-sm btn-primary add-to-cart-btn" data-item-id="${item.id}">Add to Cart 🛒</button>`;
+        stockBtnHTML = `<button class="swiggy-add-btn add-to-cart-btn" data-item-id="${item.id}">ADD <span class="plus">+</span></button>`;
       } else if (item.status === 'OutOfStock') {
-        stockBtnHTML = `<span class="badge" style="background-color:var(--danger); color:white; font-size:0.75rem;">OUT OF STOCK</span>`;
+        stockBtnHTML = `<span class="swiggy-out-of-stock-badge">OUT OF STOCK</span>`;
       } else {
-        stockBtnHTML = `<span class="badge" style="background-color:var(--text-muted); color:white; font-size:0.75rem;">TEMP UNAVAILABLE</span>`;
+        stockBtnHTML = `<span class="swiggy-unavailable-badge">UNAVAILABLE</span>`;
       }
 
+      // Veg vs Non-Veg determination
+      const isVeg = !['chicken', 'egg', 'fish', 'meat', 'mutton', 'pork', 'beef'].some(keyword => item.name.toLowerCase().includes(keyword));
+      
+      // Deterministic mock rating based on popularityScore
+      const mockRating = (4.0 + (item.popularityScore % 10) / 10).toFixed(1);
+      const ratingCount = 20 + (item.popularityScore * 2);
+
       card.innerHTML = `
-        <div class="food-card-img">
-          <img src="${item.image}" alt="${item.name}">
-        </div>
         <div class="food-card-details">
+          <div class="veg-indicator-box ${isVeg ? 'veg' : 'non-veg'}" title="${isVeg ? 'Veg' : 'Non-Veg'}">
+            <span class="veg-dot-icon"></span>
+          </div>
           <h4 class="food-card-name">${item.name}</h4>
           <p class="food-card-canteen">🏪 ${canteen ? canteen.name : 'Unknown'}</p>
           <div class="food-card-meta">
-            <span>⏱️ ${item.prepTime} mins</span>
-            <span>🔥 Popularity: ${item.popularityScore || 50}%</span>
+            <span class="food-card-rating"><span class="star-icon">★</span> ${mockRating} (${ratingCount})</span>
+            <span class="food-card-prep-time">⏱️ ${item.prepTime} mins</span>
           </div>
           <div class="food-card-price-row">
             <span class="food-card-price">₹${item.price}</span>
+          </div>
+          <p class="food-card-desc">${item.description || 'Delectable fresh campus preparation.'}</p>
+        </div>
+        <div class="food-card-media-wrapper">
+          <div class="food-card-img">
+            <img src="${item.image}" alt="${item.name}">
+          </div>
+          <div class="add-btn-wrapper">
             ${stockBtnHTML}
           </div>
         </div>

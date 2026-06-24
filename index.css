@@ -86,10 +86,18 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   overflow-x: hidden;
-  background-image: 
-    radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-    radial-gradient(at 90% 80%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+  background-image: url('login_background.png');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
+  transition: background 0.3s ease, filter 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image: linear-gradient(rgba(11, 15, 25, 0.88), rgba(11, 15, 25, 0.88)), url('login_background.png');
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -283,18 +291,8 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   width: 100vw;
-  background-image: url('login_background.png');
-  background-size: cover;
-  background-position: left center;
-  background-repeat: no-repeat;
   transition: all 0.3s ease;
   position: relative;
-}
-
-@media (prefers-color-scheme: dark) {
-  .login-container {
-    background-image: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.85)), url('login_background.png');
-  }
 }
 
 .login-container.active {
@@ -915,26 +913,123 @@ input:focus, select:focus, textarea:focus {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1rem;
+  padding: 1.25rem;
   display: flex;
-  gap: 1rem;
-  align-items: center;
-  transition: all 0.25s ease;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: stretch;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--backdrop-blur);
 }
 .food-card:hover {
-  border-color: var(--border-focus);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.veg-indicator-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  margin-bottom: 0.4rem;
+}
+.veg-indicator-box.veg {
+  border: 2px solid #0f8a5f;
+}
+.veg-indicator-box.non-veg {
+  border: 2px solid #e23744;
+}
+
+.veg-dot-icon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: block;
+}
+.veg-indicator-box.veg .veg-dot-icon {
+  background-color: #0f8a5f;
+}
+.veg-indicator-box.non-veg .veg-dot-icon {
+  background-color: #e23744;
+}
+
+.food-card-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.food-card-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+}
+.food-card-canteen {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.food-card-price-row {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.food-card-price {
+  font-weight: 800;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.food-card-meta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.food-card-rating {
+  color: var(--swiggy-orange);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.food-card-rating .star-icon {
+  color: var(--swiggy-orange);
+}
+
+.food-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.food-card-media-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .food-card-img {
-  width: 75px;
-  height: 75px;
+  width: 100%;
+  height: 100%;
   background-color: var(--bg-tertiary);
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 .food-card-img img {
   width: 100%;
@@ -942,37 +1037,63 @@ input:focus, select:focus, textarea:focus {
   object-fit: cover;
 }
 
-.food-card-details {
-  flex: 1;
+.add-btn-wrapper {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  text-align: center;
+  z-index: 2;
 }
 
-.food-card-name {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.15rem;
-}
-.food-card-canteen {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-.food-card-price-row {
+.swiggy-add-btn {
+  background: #ffffff;
+  color: #25963e;
+  border: 1px solid rgba(37, 150, 62, 0.4);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  width: 100%;
+  transition: all 0.2s ease;
+  letter-spacing: 0.05em;
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 0.5rem;
+  gap: 4px;
 }
-.food-card-price {
-  font-weight: 700;
-  color: var(--text-primary);
-  font-size: 1.1rem;
+.swiggy-add-btn:hover {
+  background: #f7fff9;
+  border-color: #25963e;
+  box-shadow: 0 6px 14px rgba(37, 150, 62, 0.15);
+  transform: scale(1.03);
+}
+.swiggy-add-btn:active {
+  transform: scale(0.98);
 }
 
-.food-card-meta {
-  font-size: 0.7rem;
+.swiggy-out-of-stock-badge, .swiggy-unavailable-badge {
+  background: var(--bg-tertiary);
   color: var(--text-muted);
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
+  border: 1px solid var(--border-color);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  width: 100%;
+  display: inline-block;
+  box-shadow: var(--shadow-sm);
+}
+
+.swiggy-out-of-stock-badge {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.03);
 }
 
 /* Canteens Grid */
