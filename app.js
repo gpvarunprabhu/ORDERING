@@ -209,10 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
       populateReportCanteenDropdown();
     }
 
-    // Update switcher highlighted tab
-    document.querySelectorAll('.switcher-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.targetRole === role);
-    });
   }
 
   function handleLogout() {
@@ -538,40 +534,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Password Show/Hide Toggle Listener
   document.querySelectorAll('.toggle-password-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const input = btn.previousElementSibling;
+      const input = btn.closest('.password-wrapper').querySelector('input');
+      const openEye = btn.querySelector('.open-eye');
+      const closedEye = btn.querySelector('.closed-eye');
+      
       if (input.type === 'password') {
         input.type = 'text';
-        btn.textContent = '🙈';
+        openEye.classList.add('hidden');
+        closedEye.classList.remove('hidden');
       } else {
         input.type = 'password';
-        btn.textContent = '👁️';
+        openEye.classList.remove('hidden');
+        closedEye.classList.add('hidden');
       }
     });
-  });
-
-  // Autofill button click handlers
-  document.getElementById('btn-autofill-student').addEventListener('click', () => {
-    document.getElementById('tab-student').click();
-    studentLoginForm.classList.remove('signup-mode');
-    studentLoginForm.classList.add('login-mode');
-    studentToggleModeLink.textContent = 'Sign Up';
-    studentLoginForm.querySelector('.mode-text').textContent = "Don't have an account?";
-    btnStudentLogin.textContent = 'Log In as Student';
-    
-    document.getElementById('student-email-input').value = 'arun.cse@campus.edu';
-    document.getElementById('student-pass-input').value = 'student123';
-  });
-
-  document.getElementById('btn-autofill-canteen').addEventListener('click', () => {
-    document.getElementById('tab-manager').click();
-    managerLoginForm.classList.remove('signup-mode');
-    managerLoginForm.classList.add('login-mode');
-    managerToggleModeLink.textContent = 'Register Canteen';
-    managerLoginForm.querySelector('.mode-text').textContent = "Don't have a canteen account?";
-    btnManagerLogin.textContent = 'Access Vendor Panel';
-
-    document.getElementById('manager-email-input').value = 'ramesh@canteen.edu';
-    document.getElementById('manager-pass-input').value = 'canteen123';
   });
 
   // Back button for Canteen Selection view in Student discover view
@@ -579,16 +555,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('student-menu-section').classList.remove('active');
     document.getElementById('student-canteen-selection-section').classList.add('active');
     document.getElementById('canteen-filter').value = 'all';
-  });
-    const email = document.getElementById('admin-email-input').value;
-    const pass = document.getElementById('admin-pass-input').value;
-
-    if (email === 'admin@campus.edu' && pass === 'admin123') {
-      switchRoleView('admin');
-      showToast('Global Administrator Session Initialized.', 'success');
-    } else {
-      showToast('Invalid Admin Credentials.', 'danger');
-    }
   });
   // --- 6. STUDENT PORTAL LOGIC ---
   // Sub-view Tab Switcher
@@ -2511,37 +2477,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  // --- 10. DEVELOPER FLOATING BYPASS SWITCHER ---
-  const switcherBtn = document.getElementById('switcher-toggle-btn');
-  const switcherMenu = document.getElementById('switcher-menu');
 
-  switcherBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    switcherMenu.classList.toggle('active');
-  });
-
-  document.addEventListener('click', () => {
-    switcherMenu.classList.remove('active');
-  });
-
-  switcherMenu.querySelectorAll('.switcher-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      switcherMenu.classList.remove('active');
-      const targetRole = btn.dataset.targetRole;
-      
-      // Seed default profiles for bypass
-      if (targetRole === 'student') {
-        const student = window.db.getStudentById('STU001');
-        switchRoleView('student', student);
-      } else if (targetRole === 'manager') {
-        const canteen = window.db.getCanteenById('CAN001');
-        switchRoleView('manager', canteen);
-      } else if (targetRole === 'admin') {
-        switchRoleView('admin');
-      }
-    });
-  });
 
 
   // --- 11. INITIAL APP RENDERING SEED BOOTSTRAP ---
