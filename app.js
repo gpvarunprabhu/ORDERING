@@ -161,8 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
       uName.textContent = userObj.name;
       uDetails.textContent = `${userObj.department} - Year ${userObj.year}`;
       
-      // Load student discovery menu
+      // Load student discovery menu (Canteen selection is shown first)
       switchStudentSubView('student-discover');
+      document.getElementById('student-canteen-selection-section').classList.add('active');
+      document.getElementById('student-menu-section').classList.remove('active');
+      document.getElementById('canteen-filter').value = 'all';
+
       renderStudentAlertBanner();
       renderStudentDiscovery();
       renderCanteensGrid();
@@ -246,48 +250,100 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Populate Canteen dropdown in operator form
+  // Populate Canteen dropdown (stubbed)
   function populateManagerCanteenDropdown() {
-    const dropdown = document.getElementById('manager-canteen-select');
-    dropdown.innerHTML = '<option value="" disabled selected>Choose canteen...</option>';
-    window.db.getCanteens().forEach(c => {
-      if (c.status === 'Active') {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
-        dropdown.appendChild(opt);
-      }
-    });
+    // Dropdown removed in new design, stubbed out to prevent errors
   }
-  populateManagerCanteenDropdown();
 
-  // Student manual login submission
+  // Student manual login/registration submission
+  const studentLoginForm = document.getElementById('student-login-form');
+  const btnStudentLogin = document.getElementById('btn-student-login');
+  const studentToggleModeLink = document.getElementById('student-toggle-mode');
+
+  studentToggleModeLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (studentLoginForm.classList.contains('login-mode')) {
+      studentLoginForm.classList.remove('login-mode');
+      studentLoginForm.classList.add('signup-mode');
+      studentToggleModeLink.textContent = 'Log In';
+      studentLoginForm.querySelector('.mode-text').textContent = 'Already have an account?';
+      btnStudentLogin.textContent = 'Sign Up as Student';
+      
+      document.getElementById('student-name-input').required = true;
+      document.getElementById('student-id-input').required = true;
+    } else {
+      studentLoginForm.classList.remove('signup-mode');
+      studentLoginForm.classList.add('login-mode');
+      studentToggleModeLink.textContent = 'Sign Up';
+      studentLoginForm.querySelector('.mode-text').textContent = "Don't have an account?";
+      btnStudentLogin.textContent = 'Log In as Student';
+      
+      document.getElementById('student-name-input').required = false;
+      document.getElementById('student-id-input').required = false;
+    }
+  });
+
   document.getElementById('student-login-inner-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const inputId = document.getElementById('student-id-input').value.trim();
-    const inputEmail = document.getElementById('student-email-input').value.trim();
+    const isLoginMode = studentLoginForm.classList.contains('login-mode');
+    const email = document.getElementById('student-email-input').value.trim();
+    const pass = document.getElementById('student-pass-input').value.trim();
     
-    const students = window.db.getStudents();
-    const found = students.find(s => s.id.toLowerCase() === inputId.toLowerCase() || s.mobile === inputId);
-    
-    if (!found) {
-      showToast('Student ID or Mobile Number not registered.', 'danger');
-      return;
-    }
+    if (isLoginMode) {
+      // Login validation
+      const students = window.db.getStudents();
+      const found = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+      
+      if (!found) {
+        showToast('College Email ID not registered.', 'danger');
+        return;
+      }
 
-    if (found.status === 'Blocked') {
-      showToast('🛑 Access Denied: This student account has been blocked for policy violations.', 'danger');
-      return;
-    }
+      if (found.status === 'Blocked') {
+        showToast('🛑 Access Denied: This student account has been blocked.', 'danger');
+        return;
+      }
 
-    // Match email
-    if (found.email.toLowerCase() !== inputEmail.toLowerCase()) {
-      showToast('Email address does not match this Student ID.', 'danger');
-      return;
-    }
+      if (found.password !== pass) {
+        showToast('Incorrect password for this student account.', 'danger');
+        return;
+      }
 
-    switchRoleView('student', found);
-    showToast(`Welcome back, ${found.name}!`, 'success');
+      switchRoleView('student', found);
+      showToast(`Welcome back, ${found.name}!`, 'success');
+    } else {
+      // Registration/Sign Up
+      const name = document.getElementById('student-name-input').value.trim();
+      const studentId = document.getElementById('student-id-input').value.trim();
+      
+      const students = window.db.getStudents();
+      const existId = students.find(s => s.id.toLowerCase() === studentId.toLowerCase());
+      if (existId) {
+        showToast('Student ID Card No already registered.', 'danger');
+        return;
+      }
+
+      const existEmail = students.find(s => s.email.toLowerCase() === email.toLowerCase());
+      if (existEmail) {
+        showToast('College Email ID already registered.', 'danger');
+        return;
+      }
+
+      const newStudent = {
+        id: studentId,
+        name: name,
+        department: 'Computer Science',
+        year: 'I',
+        mobile: '9' + Math.floor(100000000 + Math.random() * 900000000),
+        email: email,
+        password: pass,
+        status: 'Active'
+      };
+
+      window.db.saveStudent(newStudent);
+      switchRoleView('student', newStudent);
+      showToast(`Registration Success! Welcome, ${name}.`, 'success');
+    }
   });
 
   // Google OAuth Simulator
@@ -360,6 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         year: 'I',
         mobile: randomMobile,
         email: email,
+        password: 'googleUser123',
         status: 'Active'
       };
 
@@ -372,32 +429,157 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('google-custom-auth-form').reset();
   });
 
-  // Manager manual login submission
-  document.getElementById('manager-login-form').addEventListener('submit', (e) => {
+  // Manager/Canteen manual login/registration submission
+  const managerLoginForm = document.getElementById('manager-login-form');
+  const btnManagerLogin = document.getElementById('btn-manager-login');
+  const managerToggleModeLink = document.getElementById('manager-toggle-mode');
+
+  managerToggleModeLink.addEventListener('click', (e) => {
     e.preventDefault();
-    const canteenId = document.getElementById('manager-canteen-select').value;
-    const pin = document.getElementById('manager-pass-input').value;
+    if (managerLoginForm.classList.contains('login-mode')) {
+      managerLoginForm.classList.remove('login-mode');
+      managerLoginForm.classList.add('signup-mode');
+      managerToggleModeLink.textContent = 'Log In';
+      managerLoginForm.querySelector('.mode-text').textContent = 'Already registered?';
+      btnManagerLogin.textContent = 'Register & Open Canteen';
+      
+      document.getElementById('manager-owner-input').required = true;
+      document.getElementById('manager-canteen-input').required = true;
+    } else {
+      managerLoginForm.classList.remove('signup-mode');
+      managerLoginForm.classList.add('login-mode');
+      managerToggleModeLink.textContent = 'Register Canteen';
+      managerLoginForm.querySelector('.mode-text').textContent = "Don't have a canteen account?";
+      btnManagerLogin.textContent = 'Access Vendor Panel';
+      
+      document.getElementById('manager-owner-input').required = false;
+      document.getElementById('manager-canteen-input').required = false;
+    }
+  });
+
+  document.getElementById('manager-login-inner-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isLoginMode = managerLoginForm.classList.contains('login-mode');
+    const email = document.getElementById('manager-email-input').value.trim();
+    const pass = document.getElementById('manager-pass-input').value.trim();
     
-    if (!canteenId) {
-      showToast('Please select a canteen.', 'danger');
-      return;
-    }
+    if (isLoginMode) {
+      // Login validation
+      const canteens = window.db.getCanteens();
+      const found = canteens.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
+      
+      if (!found) {
+        showToast('Canteen Email ID not registered.', 'danger');
+        return;
+      }
 
-    if (pin !== '1234') {
-      showToast('Invalid Security PIN. (Default is 1234)', 'danger');
-      return;
-    }
+      if (found.status === 'Inactive') {
+        showToast('🛑 Canteen is currently inactive. Contact Admin.', 'danger');
+        return;
+      }
 
-    const canteen = window.db.getCanteenById(canteenId);
-    if (canteen) {
-      switchRoleView('manager', canteen);
-      showToast(`Welcome, ${canteen.manager} (${canteen.name})`, 'success');
+      if (found.password !== pass) {
+        showToast('Incorrect password.', 'danger');
+        return;
+      }
+
+      switchRoleView('manager', found);
+      showToast(`Welcome, ${found.manager} (${found.name})`, 'success');
+    } else {
+      // Registration/Sign Up
+      const owner = document.getElementById('manager-owner-input').value.trim();
+      const canteenName = document.getElementById('manager-canteen-input').value.trim();
+      
+      const canteens = window.db.getCanteens();
+      const existEmail = canteens.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
+      if (existEmail) {
+        showToast('Email ID already registered to a canteen.', 'danger');
+        return;
+      }
+
+      let newCanteen = {
+        name: canteenName,
+        location: 'Main Block - Ground Floor',
+        manager: owner,
+        phone: '944321' + Math.floor(1000 + Math.random() * 9000),
+        email: email,
+        password: pass,
+        status: 'Active'
+      };
+
+      newCanteen = window.db.saveCanteen(newCanteen);
+      
+      // Seed default items
+      const defaultItems = [
+        { canteenId: newCanteen.id, name: 'Filter Coffee', category: 'Drinks', price: 20, prepTime: 3, image: window.db.getFoodItems()[2].image, status: 'Available', isSpecial: true, description: 'Freshly brewed campus filter coffee.' },
+        { canteenId: newCanteen.id, name: 'Veg Sandwich', category: 'Snacks', price: 45, prepTime: 6, image: window.db.getFoodItems()[3].image, status: 'Available', isSpecial: false, description: 'Grilled vegetable sandwich.' }
+      ];
+      defaultItems.forEach(item => window.db.saveFoodItem(item));
+
+      switchRoleView('manager', newCanteen);
+      showToast(`Canteen registered successfully! Welcome, ${owner}.`, 'success');
     }
   });
 
   // Admin manual login submission
-  document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+  document.getElementById('admin-login-inner-form').addEventListener('submit', (e) => {
     e.preventDefault();
+    const email = document.getElementById('admin-email-input').value;
+    const pass = document.getElementById('admin-pass-input').value;
+
+    if (email === 'admin@campus.edu' && pass === 'admin123') {
+      switchRoleView('admin');
+      showToast('Global Administrator Session Initialized.', 'success');
+    } else {
+      showToast('Invalid Admin Credentials.', 'danger');
+    }
+  });
+
+  // Password Show/Hide Toggle Listener
+  document.querySelectorAll('.toggle-password-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.previousElementSibling;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    });
+  });
+
+  // Autofill button click handlers
+  document.getElementById('btn-autofill-student').addEventListener('click', () => {
+    document.getElementById('tab-student').click();
+    studentLoginForm.classList.remove('signup-mode');
+    studentLoginForm.classList.add('login-mode');
+    studentToggleModeLink.textContent = 'Sign Up';
+    studentLoginForm.querySelector('.mode-text').textContent = "Don't have an account?";
+    btnStudentLogin.textContent = 'Log In as Student';
+    
+    document.getElementById('student-email-input').value = 'arun.cse@campus.edu';
+    document.getElementById('student-pass-input').value = 'student123';
+  });
+
+  document.getElementById('btn-autofill-canteen').addEventListener('click', () => {
+    document.getElementById('tab-manager').click();
+    managerLoginForm.classList.remove('signup-mode');
+    managerLoginForm.classList.add('login-mode');
+    managerToggleModeLink.textContent = 'Register Canteen';
+    managerLoginForm.querySelector('.mode-text').textContent = "Don't have a canteen account?";
+    btnManagerLogin.textContent = 'Access Vendor Panel';
+
+    document.getElementById('manager-email-input').value = 'ramesh@canteen.edu';
+    document.getElementById('manager-pass-input').value = 'canteen123';
+  });
+
+  // Back button for Canteen Selection view in Student discover view
+  document.getElementById('btn-back-to-canteens').addEventListener('click', () => {
+    document.getElementById('student-menu-section').classList.remove('active');
+    document.getElementById('student-canteen-selection-section').classList.add('active');
+    document.getElementById('canteen-filter').value = 'all';
+  });
     const email = document.getElementById('admin-email-input').value;
     const pass = document.getElementById('admin-pass-input').value;
 
@@ -510,9 +692,21 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       card.addEventListener('click', () => {
         document.getElementById('canteen-filter').value = c.id;
+        document.getElementById('active-selected-canteen-name').textContent = `🏪 ${c.name}`;
+        
+        // Switch section visibility
+        document.getElementById('student-canteen-selection-section').classList.remove('active');
+        document.getElementById('student-menu-section').classList.add('active');
+
+        // Reset search states
         state.searchQuery = '';
         document.getElementById('search-food').value = '';
-        renderMenuGrid();
+        state.activeCategory = 'all';
+        document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.category === 'all');
+        });
+
+        renderStudentDiscovery();
       });
       grid.appendChild(card);
     });
