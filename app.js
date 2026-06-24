@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   populateManagerCanteenDropdown();
 
   // Student manual login submission
-  document.getElementById('student-login-form').addEventListener('submit', (e) => {
+  document.getElementById('student-login-inner-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const inputId = document.getElementById('student-id-input').value.trim();
     const inputEmail = document.getElementById('student-email-input').value.trim();
@@ -288,61 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switchRoleView('student', found);
     showToast(`Welcome back, ${found.name}!`, 'success');
-  });
-
-  // Toggle Student Sign In / Sign Up views
-  document.getElementById('link-go-to-signup').addEventListener('click', () => {
-    document.getElementById('student-signin-section').classList.add('hidden');
-    document.getElementById('student-signup-section').classList.remove('hidden');
-  });
-
-  document.getElementById('link-go-to-signin').addEventListener('click', () => {
-    document.getElementById('student-signup-section').classList.add('hidden');
-    document.getElementById('student-signin-section').classList.remove('hidden');
-  });
-
-  // Student manual registration submission
-  document.getElementById('student-register-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const regId = document.getElementById('reg-id-input').value.trim().toUpperCase();
-    const name = document.getElementById('reg-name-input').value.trim();
-    const dept = document.getElementById('reg-dept-select').value;
-    const year = document.getElementById('reg-year-select').value;
-    const mobile = document.getElementById('reg-mobile-input').value.trim();
-    const email = document.getElementById('reg-email-input').value.trim();
-
-    // Check if ID exists
-    const students = window.db.getStudents();
-    if (students.some(s => s.id.toLowerCase() === regId.toLowerCase())) {
-      showToast('Student ID already registered. Use Sign In.', 'danger');
-      return;
-    }
-
-    // Check if email or mobile exists
-    if (students.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-      showToast('Email address is already in use.', 'danger');
-      return;
-    }
-
-    const newStudent = {
-      id: regId,
-      name: name,
-      department: dept,
-      year: year,
-      mobile: mobile,
-      email: email,
-      status: 'Active'
-    };
-
-    window.db.saveStudent(newStudent);
-    switchRoleView('student', newStudent);
-    
-    // Reset form and toggles
-    document.getElementById('student-register-form').reset();
-    document.getElementById('student-signup-section').classList.add('hidden');
-    document.getElementById('student-signin-section').classList.remove('hidden');
-    
-    showToast(`Account created! Welcome, ${name}.`, 'success');
   });
 
   // Google OAuth Simulator

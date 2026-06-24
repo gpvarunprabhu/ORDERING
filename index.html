@@ -38,74 +38,18 @@
       <!-- Login Forms Wrapper -->
       <div class="login-forms-container">
         <!-- Student Form -->
-        <div id="student-auth-container" class="login-form active">
-          <!-- Sign In Form Sub-Section -->
-          <div id="student-signin-section">
-            <form id="student-login-form">
-              <div class="form-group">
-                <label for="student-id-input">Student ID / Mobile Number</label>
-                <input type="text" id="student-id-input" placeholder="e.g., STU001 or 9876543210" required>
-              </div>
-              <div class="form-group">
-                <label for="student-email-input">College Email Address</label>
-                <input type="email" id="student-email-input" placeholder="username@campus.edu" required>
-              </div>
-              <button type="submit" class="btn btn-primary btn-block" id="btn-student-login">Sign In as Student</button>
-            </form>
-            <div class="auth-toggle-link">
-              Don't have an account? <span id="link-go-to-signup" class="clickable-link">Sign Up</span>
+        <div id="student-login-form" class="login-form active">
+          <form id="student-login-inner-form">
+            <div class="form-group">
+              <label for="student-id-input">Student ID / Mobile Number</label>
+              <input type="text" id="student-id-input" placeholder="e.g., STU001 or 9876543210" required>
             </div>
-          </div>
-
-          <!-- Sign Up Form Sub-Section -->
-          <div id="student-signup-section" class="hidden">
-            <form id="student-register-form">
-              <div class="form-group">
-                <label for="reg-id-input">Student ID (Unique)</label>
-                <input type="text" id="reg-id-input" placeholder="e.g., STU006" required>
-              </div>
-              <div class="form-group">
-                <label for="reg-name-input">Full Name</label>
-                <input type="text" id="reg-name-input" placeholder="e.g., Arun Kumar" required>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="reg-dept-select">Department</label>
-                  <select id="reg-dept-select" required>
-                    <option value="" disabled selected>Select...</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Information Technology">Information Technology</option>
-                    <option value="Electronics & Communication">Electronics & Communication</option>
-                    <option value="Electrical & Electronics">Electrical & Electronics</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="reg-year-select">Year</label>
-                  <select id="reg-year-select" required>
-                    <option value="I">I Year</option>
-                    <option value="II">II Year</option>
-                    <option value="III">III Year</option>
-                    <option value="IV">IV Year</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="reg-mobile-input">Mobile Number</label>
-                  <input type="tel" id="reg-mobile-input" placeholder="10 digit mobile" required>
-                </div>
-                <div class="form-group">
-                  <label for="reg-email-input">College Email</label>
-                  <input type="email" id="reg-email-input" placeholder="username@campus.edu" required>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-success btn-block" id="btn-student-register">Register Account</button>
-            </form>
-            <div class="auth-toggle-link">
-              Already have an account? <span id="link-go-to-signin" class="clickable-link">Sign In</span>
+            <div class="form-group">
+              <label for="student-email-input">College Email Address</label>
+              <input type="email" id="student-email-input" placeholder="username@campus.edu" required>
             </div>
-          </div>
+            <button type="submit" class="btn btn-primary btn-block" id="btn-student-login">Sign In as Student</button>
+          </form>
 
           <!-- Google Auth separator and button -->
           <div class="google-auth-separator">
@@ -150,14 +94,6 @@
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="btn-admin-login">Sign In to Global Console</button>
         </form>
-      </div>
-
-      <!-- Styled Read-Only Demo User Credentials Box -->
-      <div class="demo-login-info">
-        <strong>⚡ Test Accounts (Copy & Paste):</strong>
-        • <b>Student:</b> ID <code>STU001</code> & Email <code>arun.cse@campus.edu</code><br>
-        • <b>Operator:</b> Select <code>Classic Food Court</code> & PIN <code>1234</code><br>
-        • <b>Admin:</b> Email <code>admin@campus.edu</code> & Password <code>admin123</code>
       </div>
     </div>
   </div>
