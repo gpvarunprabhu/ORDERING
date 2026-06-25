@@ -425,96 +425,36 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('google-custom-auth-form').reset();
   });
 
-  // Manager/Canteen manual login/registration submission
+  // Manager/Canteen manual login submission
   const managerLoginForm = document.getElementById('manager-login-form');
   const btnManagerLogin = document.getElementById('btn-manager-login');
-  const managerToggleModeLink = document.getElementById('manager-toggle-mode');
-
-  managerToggleModeLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (managerLoginForm.classList.contains('login-mode')) {
-      managerLoginForm.classList.remove('login-mode');
-      managerLoginForm.classList.add('signup-mode');
-      managerToggleModeLink.textContent = 'Log In';
-      managerLoginForm.querySelector('.mode-text').textContent = 'Already registered?';
-      btnManagerLogin.textContent = 'Register & Open Canteen';
-      
-      document.getElementById('manager-owner-input').required = true;
-      document.getElementById('manager-canteen-input').required = true;
-    } else {
-      managerLoginForm.classList.remove('signup-mode');
-      managerLoginForm.classList.add('login-mode');
-      managerToggleModeLink.textContent = 'Register Canteen';
-      managerLoginForm.querySelector('.mode-text').textContent = "Don't have a canteen account?";
-      btnManagerLogin.textContent = 'Access Vendor Panel';
-      
-      document.getElementById('manager-owner-input').required = false;
-      document.getElementById('manager-canteen-input').required = false;
-    }
-  });
 
   document.getElementById('manager-login-inner-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const isLoginMode = managerLoginForm.classList.contains('login-mode');
     const email = document.getElementById('manager-email-input').value.trim();
     const pass = document.getElementById('manager-pass-input').value.trim();
     
-    if (isLoginMode) {
-      // Login validation
-      const canteens = window.db.getCanteens();
-      const found = canteens.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
-      
-      if (!found) {
-        showToast('Canteen Email ID not registered.', 'danger');
-        return;
-      }
-
-      if (found.status === 'Inactive') {
-        showToast('🛑 Canteen is currently inactive. Contact Admin.', 'danger');
-        return;
-      }
-
-      if (found.password !== pass) {
-        showToast('Incorrect password.', 'danger');
-        return;
-      }
-
-      switchRoleView('manager', found);
-      showToast(`Welcome, ${found.manager} (${found.name})`, 'success');
-    } else {
-      // Registration/Sign Up
-      const owner = document.getElementById('manager-owner-input').value.trim();
-      const canteenName = document.getElementById('manager-canteen-input').value.trim();
-      
-      const canteens = window.db.getCanteens();
-      const existEmail = canteens.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
-      if (existEmail) {
-        showToast('Email ID already registered to a canteen.', 'danger');
-        return;
-      }
-
-      let newCanteen = {
-        name: canteenName,
-        location: 'Main Block - Ground Floor',
-        manager: owner,
-        phone: '944321' + Math.floor(1000 + Math.random() * 9000),
-        email: email,
-        password: pass,
-        status: 'Active'
-      };
-
-      newCanteen = window.db.saveCanteen(newCanteen);
-      
-      // Seed default items
-      const defaultItems = [
-        { canteenId: newCanteen.id, name: 'Filter Coffee', category: 'Drinks', price: 20, prepTime: 3, image: window.db.getFoodItems()[2].image, status: 'Available', isSpecial: true, description: 'Freshly brewed campus filter coffee.' },
-        { canteenId: newCanteen.id, name: 'Veg Sandwich', category: 'Snacks', price: 45, prepTime: 6, image: window.db.getFoodItems()[3].image, status: 'Available', isSpecial: false, description: 'Grilled vegetable sandwich.' }
-      ];
-      defaultItems.forEach(item => window.db.saveFoodItem(item));
-
-      switchRoleView('manager', newCanteen);
-      showToast(`Canteen registered successfully! Welcome, ${owner}.`, 'success');
+    // Login validation
+    const canteens = window.db.getCanteens();
+    const found = canteens.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
+    
+    if (!found) {
+      showToast('Canteen Email ID not registered.', 'danger');
+      return;
     }
+
+    if (found.status === 'Inactive') {
+      showToast('🛑 Canteen is currently inactive. Contact Admin.', 'danger');
+      return;
+    }
+
+    if (found.password !== pass) {
+      showToast('Incorrect password.', 'danger');
+      return;
+    }
+
+    switchRoleView('manager', found);
+    showToast(`Welcome, ${found.manager} (${found.name})`, 'success');
   });
 
   // Admin manual login submission
@@ -649,11 +589,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const avg = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : 'New';
       
       card.innerHTML = `
-        <h4>🏪 ${c.name}</h4>
-        <p>${c.location}</p>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <span style="font-size:0.7rem; color:var(--text-muted);">Manager: ${c.manager}</span>
-          <span style="font-size:0.8rem; color:var(--warning); font-weight:bold;">★ ${avg}</span>
+        <div class="canteen-card-img-wrapper">
+          <img src="${c.image || CANTEEN_SVGS.court}" alt="${c.name}">
+        </div>
+        <div class="canteen-card-content">
+          <h4>🏪 ${c.name}</h4>
+          <p>${c.location}</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <span style="font-size:0.7rem; color:var(--text-secondary);">Manager: ${c.manager}</span>
+            <span style="font-size:0.8rem; color:var(--warning); font-weight:bold;">★ ${avg}</span>
+          </div>
         </div>
       `;
       card.addEventListener('click', () => {
@@ -2114,6 +2059,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // CANTEEN ADD/EDIT MODAL
   const canteenModal = document.getElementById('canteen-modal');
+  let canteenImageBase64 = '';
+
+  const imageUploadInput = document.getElementById('canteen-image-upload');
+  const imagePreviewContainer = document.getElementById('canteen-image-preview');
+  const imagePreviewImg = imagePreviewContainer.querySelector('img');
+
+  imageUploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        canteenImageBase64 = event.target.result;
+        imagePreviewImg.src = canteenImageBase64;
+        imagePreviewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
   
   document.getElementById('btn-add-canteen-modal').addEventListener('click', () => {
     showCanteenModal(); // Add Mode
@@ -2125,6 +2088,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     form.reset();
     document.getElementById('canteen-id-field').value = '';
+    canteenImageBase64 = '';
+    imagePreviewContainer.style.display = 'none';
+    imagePreviewImg.src = '';
 
     if (canteenId) {
       title.textContent = 'Edit Canteen Facility Details';
@@ -2135,6 +2101,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('canteen-location-input').value = c.location;
         document.getElementById('canteen-manager-input').value = c.manager;
         document.getElementById('canteen-phone-input').value = c.phone;
+        document.getElementById('canteen-email-input').value = c.email || '';
+        document.getElementById('canteen-password-input').value = c.password || '';
+        document.getElementById('canteen-confirm-password-input').value = c.password || '';
+        
+        if (c.image) {
+          canteenImageBase64 = c.image;
+          imagePreviewImg.src = c.image;
+          imagePreviewContainer.style.display = 'block';
+        }
       }
     } else {
       title.textContent = 'Register New Campus Canteen';
@@ -2152,8 +2127,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const location = document.getElementById('canteen-location-input').value.trim();
     const manager = document.getElementById('canteen-manager-input').value.trim();
     const phone = document.getElementById('canteen-phone-input').value.trim();
+    const email = document.getElementById('canteen-email-input').value.trim();
+    const password = document.getElementById('canteen-password-input').value.trim();
+    const confirmPassword = document.getElementById('canteen-confirm-password-input').value.trim();
 
-    const data = { name, location, manager, phone };
+    if (password !== confirmPassword) {
+      showToast('Passwords do not match.', 'danger');
+      return;
+    }
+
+    const image = canteenImageBase64 || CANTEEN_SVGS.court;
+    const data = { name, location, manager, phone, email, password, image };
     if (id) data.id = id;
 
     window.db.saveCanteen(data);

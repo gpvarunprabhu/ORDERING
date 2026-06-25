@@ -16,13 +16,28 @@ const FOOD_SVGS = {
   salad: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="15" fill="%23F5FFFA"/><path d="M20 50c0 15 12 25 30 25s30-10 30-25v-3H20v3z" fill="%23D2691E"/><circle cx="35" cy="40" r="10" fill="%2332CD32"/><circle cx="65" cy="42" r="9" fill="%23228B22"/><circle cx="50" cy="36" r="11" fill="%237CFC00"/><circle cx="45" cy="46" r="6" fill="%23FF6347"/><circle cx="56" cy="45" r="7" fill="%23FFD700"/><circle cx="32" cy="48" r="5" fill="%23FF6347"/><path d="M38 35c2-2 5 2 8 0" fill="none" stroke="%238B0000" stroke-width="2"/><circle cx="50" cy="52" r="3.5" fill="%23556B2F"/></svg>`
 };
 
+// Helper SVGs for canteen facilities
+const CANTEEN_SVGS = {
+  court: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="15" fill="%23FFE4E1"/><path d="M15 75h70V45H15z" fill="%23CD5C5C"/><path d="M10 45l40-20 40 20z" fill="%238B0000"/><rect x="25" y="55" width="15" height="20" fill="%238B4513"/><rect x="55" y="52" width="20" height="12" rx="2" fill="%23FFE4B5"/><circle cx="32" cy="65" r="1.5" fill="%23FFD700"/></svg>`,
+  spicy: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="15" fill="%23FFF5EE"/><path d="M15 75h70V45H15z" fill="%23FF7F50"/><path d="M10 45l40-20 40 20z" fill="%23D01C1C"/><rect x="42" y="55" width="16" height="20" fill="%238B4513"/><circle cx="28" cy="56" r="5" fill="%23FFD700"/><circle cx="72" cy="56" r="5" fill="%23FFD700"/></svg>`,
+  healthy: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><rect width="100" height="100" rx="15" fill="%23F0FFF0"/><path d="M15 75h70V45H15z" fill="%232E8B57"/><path d="M10 45l40-20 40 20z" fill="%231E5D3D"/><rect x="40" y="55" width="20" height="20" fill="%238B4513"/><path d="M25 52h14v10H25z" fill="%23FFF"/><path d="M61 52h14v10H61z" fill="%23FFF"/></svg>`
+};
+
 class Database {
   constructor() {
     this.init();
   }
 
   init() {
-    if (!localStorage.getItem('campus_db_seeded_v3')) {
+    // Increment checking to reset seeds for the new images
+    if (!localStorage.getItem('campus_db_seeded_v4')) {
+      localStorage.removeItem('campus_students');
+      localStorage.removeItem('campus_canteens');
+      localStorage.removeItem('campus_foodItems');
+      localStorage.removeItem('campus_orders');
+      localStorage.removeItem('campus_orderDetails');
+      localStorage.removeItem('campus_reviews');
+      localStorage.removeItem('campus_db_seeded_v3');
       this.seed();
     }
   }
@@ -40,9 +55,9 @@ class Database {
 
     // 2. Canteens
     const canteens = [
-      { id: 'CAN001', name: 'Classic Food Court', location: 'Main Block - Ground Floor', manager: 'Mr. Ramesh', phone: '9443218765', email: 'ramesh@canteen.edu', password: 'canteen123', status: 'Active' },
-      { id: 'CAN002', name: 'Spicy Corner', location: 'Open Cafeteria - Near Gym', manager: 'Mr. John', phone: '9443218766', email: 'john@canteen.edu', password: 'canteen123', status: 'Active' },
-      { id: 'CAN003', name: 'Healthy & Fresh', location: 'Sports Complex Annex', manager: 'Mrs. Geetha', phone: '9443218767', email: 'geetha@canteen.edu', password: 'canteen123', status: 'Active' }
+      { id: 'CAN001', name: 'Classic Food Court', location: 'Main Block - Ground Floor', manager: 'Mr. Ramesh', phone: '9443218765', email: 'ramesh@canteen.edu', password: 'canteen123', status: 'Active', image: CANTEEN_SVGS.court },
+      { id: 'CAN002', name: 'Spicy Corner', location: 'Open Cafeteria - Near Gym', manager: 'Mr. John', phone: '9443218766', email: 'john@canteen.edu', password: 'canteen123', status: 'Active', image: CANTEEN_SVGS.spicy },
+      { id: 'CAN003', name: 'Healthy & Fresh', location: 'Sports Complex Annex', manager: 'Mrs. Geetha', phone: '9443218767', email: 'geetha@canteen.edu', password: 'canteen123', status: 'Active', image: CANTEEN_SVGS.healthy }
     ];
 
     // 3. Food Items
@@ -235,7 +250,7 @@ class Database {
     localStorage.setItem('campus_orderDetails', JSON.stringify(orderDetails));
     localStorage.setItem('campus_reviews', JSON.stringify(reviews));
     localStorage.setItem('campus_token_counter', '110'); // Last token used
-    localStorage.setItem('campus_db_seeded_v3', 'true');
+    localStorage.setItem('campus_db_seeded_v4', 'true');
   }
 
   // Generic localStorage Getters & Setters

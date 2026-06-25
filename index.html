@@ -115,24 +115,14 @@
             </div>
 
             <!-- Manager Form -->
-            <div id="manager-login-form" class="login-form login-mode">
+            <div id="manager-login-form" class="login-form active login-mode">
               <form id="manager-login-inner-form">
-                <!-- Sign Up Only Field -->
-                <div class="form-group signup-only">
-                  <label for="manager-owner-input">Name of the Owner</label>
-                  <input type="text" id="manager-owner-input" placeholder="e.g. Mr. Ramesh">
-                </div>
-                <!-- Sign Up Only Field -->
-                <div class="form-group signup-only">
-                  <label for="manager-canteen-input">Name of the Canteen</label>
-                  <input type="text" id="manager-canteen-input" placeholder="e.g. Classic Food Court">
-                </div>
-                <!-- Log In / Sign Up Field -->
+                <!-- Log In Field -->
                 <div class="form-group">
                   <label for="manager-email-input">Email ID</label>
                   <input type="email" id="manager-email-input" placeholder="manager@canteen.edu" required>
                 </div>
-                <!-- Log In / Sign Up Field with Toggle Password -->
+                <!-- Log In Field with Toggle Password -->
                 <div class="form-group">
                   <label for="manager-pass-input">Password</label>
                   <div class="password-wrapper">
@@ -152,12 +142,6 @@
                 
                 <button type="submit" class="btn btn-primary btn-block btn-accent" id="btn-manager-login">Access Vendor Panel</button>
               </form>
-
-              <!-- Switch Form Mode Link -->
-              <div class="form-mode-toggle">
-                <span class="mode-text">Don't have a canteen account?</span>
-                <a href="#" class="mode-link" id="manager-toggle-mode">Register Canteen</a>
-              </div>
             </div>
 
             <!-- Admin Form -->
@@ -901,9 +885,20 @@
           <label for="canteen-name-input">Canteen Name</label>
           <input type="text" id="canteen-name-input" placeholder="e.g. North Side Cafeteria" required>
         </div>
-        <div class="form-group">
-          <label for="canteen-location-input">Location / Block</label>
-          <input type="text" id="canteen-location-input" placeholder="e.g. Library Block, 1st Floor" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="canteen-location-input">Location / Block</label>
+            <input type="text" id="canteen-location-input" placeholder="e.g. Library Block, 1st Floor" required>
+          </div>
+          <div class="form-group">
+            <label for="canteen-image-upload">Upload Canteen Image</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="file" id="canteen-image-upload" accept="image/*" style="padding: 0.5rem 0.8rem;">
+              <div id="canteen-image-preview" style="display:none; width: 42px; height: 42px; border-radius: 6px; overflow: hidden; border:1px solid var(--border-color); flex-shrink: 0;">
+                <img src="" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+            </div>
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -913,6 +908,20 @@
           <div class="form-group">
             <label for="canteen-phone-input">Contact Phone</label>
             <input type="tel" id="canteen-phone-input" placeholder="10 digit number" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="canteen-email-input">Canteen User Email ID</label>
+          <input type="email" id="canteen-email-input" placeholder="manager@canteen.edu" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="canteen-password-input">Password</label>
+            <input type="password" id="canteen-password-input" placeholder="••••••••" required>
+          </div>
+          <div class="form-group">
+            <label for="canteen-confirm-password-input">Confirm Password</label>
+            <input type="password" id="canteen-confirm-password-input" placeholder="••••••••" required>
           </div>
         </div>
         <div class="modal-footer">
